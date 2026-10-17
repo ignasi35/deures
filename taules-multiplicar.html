@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Taules de multiplicar</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.5;
+                margin: 2rem auto;
+                max-width: 48rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .student-info {
+                display: flex;
+                gap: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .student-info span {
+                border-bottom: 1px solid #777;
+                flex: 1;
+            }
+
+            #exercises {
+                display: grid;
+                gap: 0.75rem 2rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #exercises li {
+                break-inside: avoid;
+                white-space: nowrap;
+            }
+
+            .answer-space {
+                border-bottom: 1px solid #777;
+                display: inline-block;
+                margin-left: 0.5rem;
+                min-width: 3rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 2rem;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media (max-width: 32rem) {
+                #exercises {
+                    grid-template-columns: 1fr;
+                }
+
+                .student-info {
+                    gap: 1rem;
+                }
+            }
+
+            @media print {
+                @page {
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 12pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                }
+
+                .student-info {
+                    margin: 1rem 0;
+                }
+
+                #exercises {
+                    column-gap: 1.5rem;
+                    gap: 0.55rem 1.5rem;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                #exercises li {
+                    font-size: 11pt;
+                }
+
+                .actions {
+                    display: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1>Taules de multiplicar</h1>
+            <p class="student-info">
+                Nom: <span></span>
+                Data: <span></span>
+            </p>
+            <ul id="exercises" aria-label="Exercicis de multiplicar"></ul>
+            <div class="actions">
+                <button id="new-worksheet" type="button">Nous exercicis</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <script>
+            const exercises = document.querySelector("#exercises");
+            const newWorksheetButton = document.querySelector("#new-worksheet");
+            const printWorksheetButton = document.querySelector("#print-worksheet");
+
+            function createWorksheet() {
+                const facts = [];
+                for (let first = 1; first <= 9; first += 1) {
+                    for (let second = 1; second <= 9; second += 1) {
+                        facts.push([first, second]);
+                    }
+                }
+
+                for (let index = facts.length - 1; index > 0; index -= 1) {
+                    const randomIndex = Math.floor(Math.random() * (index + 1));
+                    [facts[index], facts[randomIndex]] = [facts[randomIndex], facts[index]];
+                }
+
+                exercises.replaceChildren();
+                facts.slice(0, 40).forEach(([first, second]) => {
+                    const item = document.createElement("li");
+                    const equation = document.createElement("span");
+                    const answer = document.createElement("span");
+
+                    equation.textContent = `${first} × ${second} =`;
+                    answer.className = "answer-space";
+                    item.append(equation, answer);
+                    exercises.append(item);
+                });
+            }
+
+            newWorksheetButton.addEventListener("click", createWorksheet);
+            printWorksheetButton.addEventListener("click", () => window.print());
+            createWorksheet();
+        </script>
+    </body>
+</html>
