@@ -1,11 +1,235 @@
-<html>
+<!doctype html>
+<html lang="ca">
     <head>
-        <title>Comarques Catalunya</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Comarques de Catalunya</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.45;
+                margin: 2rem auto;
+                max-width: 74rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .worksheet {
+                align-items: start;
+                display: grid;
+                gap: 1.5rem;
+                grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.8fr);
+            }
+
+            figure {
+                margin: 0;
+            }
+
+            .map {
+                display: block;
+                height: auto;
+                width: 100%;
+            }
+
+            figcaption {
+                color: #555;
+                font-size: 0.8rem;
+                margin-top: 0.5rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+                margin: 0 0 0.75rem;
+            }
+
+            #questions {
+                display: grid;
+                gap: 0.65rem;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #questions li {
+                align-items: end;
+                display: grid;
+                gap: 0.75rem;
+                grid-template-columns: minmax(0, 1fr) 3rem;
+            }
+
+            .answer-space {
+                border-bottom: 1px solid #777;
+                display: block;
+                height: 1.3rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 1.5rem;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media (max-width: 48rem) {
+                .worksheet {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media print {
+                @page {
+                    size: A4 landscape;
+                    margin: 10mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 10pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 18pt;
+                }
+
+                .worksheet {
+                    gap: 1rem;
+                    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
+                }
+
+                #questions {
+                    gap: 0.35rem;
+                }
+
+                #questions li {
+                    break-inside: avoid;
+                }
+
+                .actions {
+                    display: none;
+                }
+
+                figcaption {
+                    font-size: 7pt;
+                }
+            }
+        </style>
     </head>
     <body>
-        <h1>Comarques Catalunya</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-            interdum, lorem at tincidunt consequat, justo erat malesuada
-            sapien, vitae consequat nibh erat sed ipsum.</p>
+        <main>
+            <h1>Comarques de Catalunya</h1>
+            <p class="instructions">Mira els números del mapa i escriu el número de cada comarca.</p>
+            <div class="worksheet">
+                <figure>
+                    <img
+                        class="map"
+                        src="comarques-catalunya-map.svg"
+                        alt="Mapa de Catalunya amb els límits de les 43 comarques, cadascuna identificada amb un número."
+                    >
+                    <figcaption>
+                        Límits comarcals basats en dades de la Generalitat de Catalunya,
+                        distribuïdes pel projecte
+                        <a href="https://github.com/psauleda/Comarques-de-Catalunya">Comarques de Catalunya</a>.
+                    </figcaption>
+                </figure>
+                <section aria-labelledby="quiz-title">
+                    <h2 id="quiz-title">Escriu el número de cada comarca</h2>
+                    <ol id="questions"></ol>
+                </section>
+            </div>
+            <div class="actions">
+                <button id="new-questions" type="button">Nous noms</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <script>
+            const comarcaNames = [
+                "Alt Camp",
+                "Alt Empordà",
+                "Alt Penedès",
+                "Alt Urgell",
+                "Alta Ribagorça",
+                "Anoia",
+                "Bages",
+                "Baix Camp",
+                "Baix Ebre",
+                "Baix Empordà",
+                "Baix Llobregat",
+                "Baix Penedès",
+                "Barcelonès",
+                "Berguedà",
+                "Cerdanya",
+                "Conca de Barberà",
+                "Garraf",
+                "Garrigues",
+                "Garrotxa",
+                "Gironès",
+                "Lluçanès",
+                "Maresme",
+                "Moianès",
+                "Montsià",
+                "Noguera",
+                "Osona",
+                "Pallars Jussà",
+                "Pallars Sobirà",
+                "Pla d'Urgell",
+                "Pla de l'Estany",
+                "Priorat",
+                "Ribera d'Ebre",
+                "Ripollès",
+                "Segarra",
+                "Segrià",
+                "Selva",
+                "Solsonès",
+                "Tarragonès",
+                "Terra Alta",
+                "Urgell",
+                "Val d'Aran",
+                "Vallès Occidental",
+                "Vallès Oriental"
+            ];
+            const questions = document.querySelector("#questions");
+
+            function createQuestions() {
+                const shuffledNames = [...comarcaNames];
+                for (let index = shuffledNames.length - 1; index > 0; index -= 1) {
+                    const randomIndex = Math.floor(Math.random() * (index + 1));
+                    [shuffledNames[index], shuffledNames[randomIndex]] =
+                        [shuffledNames[randomIndex], shuffledNames[index]];
+                }
+
+                questions.replaceChildren();
+                shuffledNames.slice(0, 20).forEach((name) => {
+                    const question = document.createElement("li");
+                    const comarca = document.createElement("span");
+                    const answer = document.createElement("span");
+
+                    comarca.textContent = name;
+                    answer.className = "answer-space";
+                    answer.setAttribute("aria-label", "Número de la comarca");
+                    question.append(comarca, answer);
+                    questions.append(question);
+                });
+            }
+
+            document.querySelector("#new-questions").addEventListener("click", createQuestions);
+            document.querySelector("#print-worksheet").addEventListener("click", () => window.print());
+            createQuestions();
+        </script>
     </body>
 </html>
