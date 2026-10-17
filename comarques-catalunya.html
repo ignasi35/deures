@@ -65,6 +65,10 @@
                 grid-template-columns: minmax(0, 1fr) 3rem;
             }
 
+            #questions[data-mode="numbers"] li {
+                grid-template-columns: minmax(0, 1fr) 9rem;
+            }
+
             .answer-space {
                 border-bottom: 1px solid #777;
                 display: block;
@@ -133,7 +137,7 @@
     <body>
         <main>
             <h1>Comarques de Catalunya</h1>
-            <p class="instructions">Mira els números del mapa i escriu el número de cada comarca.</p>
+            <p class="instructions" id="quiz-instructions"></p>
             <div class="worksheet">
                 <figure>
                     <img
@@ -148,12 +152,12 @@
                     </figcaption>
                 </figure>
                 <section aria-labelledby="quiz-title">
-                    <h2 id="quiz-title">Escriu el número de cada comarca</h2>
+                    <h2 id="quiz-title"></h2>
                     <ol id="questions"></ol>
                 </section>
             </div>
             <div class="actions">
-                <button id="new-questions" type="button">Nous noms</button>
+                <button id="new-questions" type="button">Nous exercicis</button>
                 <button id="print-worksheet" type="button">Imprimeix</button>
             </div>
         </main>
@@ -204,25 +208,45 @@
                 "Vallès Oriental"
             ];
             const questions = document.querySelector("#questions");
+            const quizTitle = document.querySelector("#quiz-title");
+            const quizInstructions = document.querySelector("#quiz-instructions");
+            const quizMode = Math.random() < 0.5 ? "names" : "numbers";
+
+            function shuffle(items) {
+                for (let index = items.length - 1; index > 0; index -= 1) {
+                    const randomIndex = Math.floor(Math.random() * (index + 1));
+                    [items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+                }
+                return items;
+            }
 
             function createQuestions() {
-                const shuffledNames = [...comarcaNames];
-                for (let index = shuffledNames.length - 1; index > 0; index -= 1) {
-                    const randomIndex = Math.floor(Math.random() * (index + 1));
-                    [shuffledNames[index], shuffledNames[randomIndex]] =
-                        [shuffledNames[randomIndex], shuffledNames[index]];
-                }
+                const isNameQuiz = quizMode === "names";
+                const prompts = isNameQuiz
+                    ? shuffle([...comarcaNames]).slice(0, 20)
+                    : shuffle(Array.from({ length: comarcaNames.length }, (_, index) => index + 1))
+                        .slice(0, 20);
 
+                quizTitle.textContent = isNameQuiz
+                    ? "Escriu el número de cada comarca"
+                    : "Escriu el nom de cada comarca";
+                quizInstructions.textContent = isNameQuiz
+                    ? "Mira els números del mapa i escriu el número de cada comarca."
+                    : "Mira els números del mapa i escriu el nom de cada comarca.";
+                questions.dataset.mode = quizMode;
                 questions.replaceChildren();
-                shuffledNames.slice(0, 20).forEach((name) => {
+                prompts.forEach((prompt) => {
                     const question = document.createElement("li");
-                    const comarca = document.createElement("span");
+                    const promptText = document.createElement("span");
                     const answer = document.createElement("span");
 
-                    comarca.textContent = name;
+                    promptText.textContent = prompt;
                     answer.className = "answer-space";
-                    answer.setAttribute("aria-label", "Número de la comarca");
-                    question.append(comarca, answer);
+                    answer.setAttribute(
+                        "aria-label",
+                        isNameQuiz ? "Número de la comarca" : "Nom de la comarca"
+                    );
+                    question.append(promptText, answer);
                     questions.append(question);
                 });
             }
