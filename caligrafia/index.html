@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Pràctica de cal·ligrafia</title>
+        <style>
+            @font-face {
+                font-family: "Dancing Script";
+                font-style: normal;
+                font-weight: 400 700;
+                src: url("fonts/DancingScript.ttf") format("truetype");
+            }
+            @font-face {
+                font-family: "Learning Curve";
+                font-style: normal;
+                font-weight: 400;
+                src: url("fonts/LearningCurve-Regular.ttf") format("truetype");
+            }
+
+            @font-face {
+                font-family: "Sacramento";
+                font-style: normal;
+                font-weight: 400;
+                src: url("fonts/Sacramento-Regular.ttf") format("truetype");
+            }
+
+            @font-face {
+                font-family: "Playwrite ES";
+                font-style: normal;
+                font-weight: 100 400;
+                src: url("fonts/PlaywriteES.ttf") format("truetype");
+            }
+
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.5;
+                margin: 2rem auto;
+                max-width: 48rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .font-selector {
+                margin-bottom: 1rem;
+            }
+
+            .font-selector label {
+                margin-right: 0.5rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .student-info {
+                display: flex;
+                gap: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .student-info span {
+                border-bottom: 1px solid #777;
+                flex: 1;
+            }
+
+            #sentences {
+                display: grid;
+                gap: 2rem;
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #sentences li {
+                break-inside: avoid;
+            }
+
+            .sentence {
+                font-family: var(--sentence-font-family, "Learning Curve"), cursive;
+                font-size: var(--sentence-font-size, 1.6rem);
+                font-weight: 400;
+                line-height: 1.2;
+                margin-bottom: 0.25rem;
+            }
+
+            .practice-lines {
+                display: grid;
+                grid-template-rows: repeat(5, 2rem);
+            }
+
+            .practice-lines span {
+                border-bottom: 1px solid #888;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 2rem;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media (max-width: 32rem) {
+                .student-info {
+                    gap: 1rem;
+                }
+            }
+
+            @media print {
+                @page {
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 12pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                }
+
+                .student-info {
+                    margin: 1rem 0;
+                }
+
+                #sentences {
+                    gap: 1.5rem;
+                }
+
+                .sentence {
+                    font-size: var(--sentence-print-font-size, 17pt);
+                    margin-bottom: 0;
+                }
+
+                .practice-lines {
+                    grid-template-rows: repeat(5, 1.6rem);
+                }
+
+                .actions {
+                    display: none;
+                }
+
+                .font-selector {
+                    display: none;
+                }
+
+                .index-link {
+                    display: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <p class="index-link"><a href="../index.html">Torna a l’índex</a></p>
+            <div class="font-selector">
+                <label for="font-choice">Tipus de lletra:</label>
+                <select id="font-choice">
+                    <option value="playwrite-es">Playwrite ES</option>
+                    <option value="learning-curve">Learning Curve</option>
+                    <option value="sacramento">Sacramento</option>
+                    <option value="dancing-script">Dancing Script</option>
+                </select>
+            </div>
+            <h1>Pràctica de cal·ligrafia</h1>
+            <p class="instructions">Llegeix cada frase i copia-la als rengles de sota.</p>
+            <p class="student-info">
+                Nom: <span></span>
+                Data: <span></span>
+            </p>
+            <ol id="sentences" aria-label="Frases per practicar cal·ligrafia"></ol>
+            <div class="actions">
+                <button id="new-worksheet" type="button">Frases noves</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <script>
+            const sentenceGroups = [
+                {
+                    subjects: [
+                        "L’Aina", "En Biel", "La Clara", "La Duna", "L’Èric",
+                        "La Fàtima", "En Guillem", "La Hana", "L’Iu", "La Júlia",
+                        "En Kai", "La Laia", "En Martí", "La Nora", "L’Ona",
+                        "En Pau", "La Queralt", "En Walt", "En Youssef", "La Zoe"
+                    ],
+                    actions: [
+                        "dibuixa una casa de colors al costat del riu",
+                        "llegeix un conte d’aventures abans d’anar a dormir",
+                        "prepara una coca de xocolata per berenar",
+                        "passeja pel camí amb un paraigua groc",
+                        "escriu una postal a la seva àvia",
+                        "observa els núvols des del cim de la muntanya",
+                        "busca una petxina a la platja",
+                        "toca el xilòfon amb molta alegria",
+                        "munta un puzle amb peces de colors",
+                        "planta flors al jardí de l’escola"
+                    ]
+                },
+                {
+                    subjects: ["El gat", "La guineu", "L’eriçó", "El cavall", "La zebra"],
+                    actions: [
+                        "salta entre les herbes del prat",
+                        "busca menjar sota les fulles",
+                        "descansa a l’ombra d’un arbre",
+                        "corre pel bosc quan surt el sol",
+                        "observa la lluna des del turó",
+                        "juga amb una branca al costat del rierol",
+                        "creua el camí sense fer soroll",
+                        "segueix les petjades fins a la cova",
+                        "escolta el xiuxiueig del vent",
+                        "beu aigua fresca prop del bassal"
+                    ]
+                },
+                {
+                    subjects: ["L’oreneta", "El mussol", "La papallona", "L’abella", "El ratpenat"],
+                    actions: [
+                        "vola per damunt dels camps verds",
+                        "busca un refugi entre les branques",
+                        "s’atura damunt d’una flor silvestre",
+                        "travessa el cel abans que arribi la pluja",
+                        "fa un niu ben calent sota la teulada",
+                        "segueix el rastre de la llum del matí",
+                        "s’amaga del vent dins d’un arbre vell",
+                        "visita les flors del jardí",
+                        "creua la vall amb les ales ben obertes",
+                        "es desperta quan el sol il·lumina el bosc"
+                    ]
+                },
+                {
+                    subjects: ["El dofí", "La balena", "La tortuga marina", "El peix", "El pop"],
+                    actions: [
+                        "neda pel mar d’aigua blava",
+                        "busca aliment entre els esculls",
+                        "s’amaga sota una roca del fons marí",
+                        "segueix les bombolles fins a la superfície",
+                        "travessa una badia tranquil·la",
+                        "juga amb les onades prop de la costa",
+                        "explora una cova plena de coralls",
+                        "es mou entre les algues verdes",
+                        "descansa al fons de l’oceà",
+                        "surt a respirar quan el mar és en calma"
+                    ]
+                },
+                {
+                    subjects: [
+                        "El riu", "La muntanya", "La vall", "El bosc", "El mar",
+                        "La platja", "El prat", "El cel", "El llac", "La cascada",
+                        "El desert", "La plana", "El volcà", "La pineda", "L’horitzó"
+                    ],
+                    actions: [
+                        "brilla sota el sol del matí",
+                        "es tenyeix de taronja quan arriba el vespre",
+                        "es desperta amb la boira de la matinada",
+                        "reflecteix els núvols blancs i el cel blau",
+                        "rep la visita del vent i de la pluja",
+                        "canvia d’aspecte a cada estació de l’any",
+                        "sembla màgic quan la lluna il·lumina el camí",
+                        "convida els caminants a fer una pausa",
+                        "guarda mil secrets a l’ombra dels arbres",
+                        "forma part d’un paisatge tranquil i silenciós"
+                    ]
+                }
+            ];
+
+            const sentenceCorpus = sentenceGroups.flatMap(({ subjects, actions }) =>
+                subjects.flatMap((subject) =>
+                    actions.map((action) => `${subject} ${action}.`)
+                )
+            );
+
+            const sentences = document.querySelector("#sentences");
+            const newWorksheetButton = document.querySelector("#new-worksheet");
+            const printWorksheetButton = document.querySelector("#print-worksheet");
+            const fontChoice = document.querySelector("#font-choice");
+            const fontFamilies = {
+                "playwrite-es": '"Playwrite ES"',
+                "learning-curve": '"Learning Curve"',
+                sacramento: '"Sacramento"',
+                "dancing-script": '"Dancing Script"'
+            };
+            const fontOptions = Object.keys(fontFamilies);
+            fontChoice.value = fontOptions[Math.floor(Math.random() * fontOptions.length)];
+
+            function updateSentenceStyle() {
+                const isPlaywrite = fontChoice.value === "playwrite-es";
+                document.documentElement.style.setProperty(
+                    "--sentence-font-family",
+                    fontFamilies[fontChoice.value]
+                );
+                document.documentElement.style.setProperty(
+                    "--sentence-font-size",
+                    isPlaywrite ? "1.6rem" : "2.4rem"
+                );
+                document.documentElement.style.setProperty(
+                    "--sentence-print-font-size",
+                    isPlaywrite ? "17pt" : "23pt"
+                );
+            }
+
+            updateSentenceStyle();
+            fontChoice.addEventListener("change", updateSentenceStyle);
+
+            function createWorksheet() {
+                const shuffledSentences = [...sentenceCorpus];
+                for (let index = shuffledSentences.length - 1; index > 0; index -= 1) {
+                    const randomIndex = Math.floor(Math.random() * (index + 1));
+                    [shuffledSentences[index], shuffledSentences[randomIndex]] =
+                        [shuffledSentences[randomIndex], shuffledSentences[index]];
+                }
+
+                sentences.replaceChildren();
+                shuffledSentences.slice(0, 4).forEach((text) => {
+                    const item = document.createElement("li");
+                    const sentence = document.createElement("div");
+                    const practiceLines = document.createElement("div");
+
+                    sentence.className = "sentence";
+                    sentence.textContent = text;
+                    practiceLines.className = "practice-lines";
+                    practiceLines.setAttribute("aria-hidden", "true");
+                    for (let line = 0; line < 5; line += 1) {
+                        practiceLines.append(document.createElement("span"));
+                    }
+
+                    item.append(sentence, practiceLines);
+                    sentences.append(item);
+                });
+            }
+
+            newWorksheetButton.addEventListener("click", createWorksheet);
+            printWorksheetButton.addEventListener("click", () => window.print());
+            createWorksheet();
+        </script>
+    </body>
+</html>
