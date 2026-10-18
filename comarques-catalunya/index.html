@@ -50,9 +50,23 @@
                 margin: 0 0 0.75rem;
             }
 
+            #question-headings,
+            #questions li {
+                display: grid;
+                grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.5fr) minmax(3rem, 0.45fr);
+                gap: 0.5rem;
+            }
+
+            #question-headings {
+                font-size: 0.8rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+
             #questions {
                 display: grid;
                 gap: 0.65rem;
+                grid-template-columns: minmax(0, 1fr);
                 list-style: none;
                 margin: 0;
                 padding: 0;
@@ -60,19 +74,17 @@
 
             #questions li {
                 align-items: end;
-                display: grid;
-                gap: 0.75rem;
-                grid-template-columns: minmax(0, 1fr) 3rem;
-            }
-
-            #questions[data-mode="numbers"] li {
-                grid-template-columns: minmax(0, 1fr) 9rem;
             }
 
             .answer-space {
                 border-bottom: 1px solid #777;
                 display: block;
                 height: 1.3rem;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                margin-top: 1rem;
             }
 
             .actions {
@@ -116,8 +128,17 @@
                     grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
                 }
 
+                .map {
+                    margin: 0 auto;
+                    width: 90%;
+                }
+
                 #questions {
                     gap: 0.35rem;
+                }
+
+                #question-headings {
+                    margin-bottom: 0.3rem;
                 }
 
                 #questions li {
@@ -130,6 +151,11 @@
 
                 .index-link {
                     display: none;
+                }
+
+                footer {
+                    font-size: 7pt;
+                    margin-top: 0.5rem;
                 }
 
                 figcaption {
@@ -158,6 +184,7 @@
                 </figure>
                 <section aria-labelledby="quiz-title">
                     <h2 id="quiz-title"></h2>
+                    <div id="question-headings"></div>
                     <ol id="questions"></ol>
                 </section>
             </div>
@@ -166,56 +193,71 @@
                 <button id="print-worksheet" type="button">Imprimeix</button>
             </div>
         </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
         <script>
-            const comarcaNames = [
-                "Alt Camp",
-                "Alt Empordà",
-                "Alt Penedès",
-                "Alt Urgell",
-                "Alta Ribagorça",
-                "Anoia",
-                "Bages",
-                "Baix Camp",
-                "Baix Ebre",
-                "Baix Empordà",
-                "Baix Llobregat",
-                "Baix Penedès",
-                "Barcelonès",
-                "Berguedà",
-                "Cerdanya",
-                "Conca de Barberà",
-                "Garraf",
-                "Garrigues",
-                "Garrotxa",
-                "Gironès",
-                "Lluçanès",
-                "Maresme",
-                "Moianès",
-                "Montsià",
-                "Noguera",
-                "Osona",
-                "Pallars Jussà",
-                "Pallars Sobirà",
-                "Pla d'Urgell",
-                "Pla de l'Estany",
-                "Priorat",
-                "Ribera d'Ebre",
-                "Ripollès",
-                "Segarra",
-                "Segrià",
-                "Selva",
-                "Solsonès",
-                "Tarragonès",
-                "Terra Alta",
-                "Urgell",
-                "Val d'Aran",
-                "Vallès Occidental",
-                "Vallès Oriental"
+            const comarques = [
+                ["Alt Camp", "Valls"],
+                ["Alt Empordà", "Figueres"],
+                ["Alt Penedès", "Vilafranca del Penedès"],
+                ["Alt Urgell", "la Seu d'Urgell"],
+                ["Alta Ribagorça", "el Pont de Suert"],
+                ["Anoia", "Igualada"],
+                ["Bages", "Manresa"],
+                ["Baix Camp", "Reus"],
+                ["Baix Ebre", "Tortosa"],
+                ["Baix Empordà", "la Bisbal d'Empordà"],
+                ["Baix Llobregat", "Sant Feliu de Llobregat"],
+                ["Baix Penedès", "el Vendrell"],
+                ["Barcelonès", "Barcelona"],
+                ["Berguedà", "Berga"],
+                ["Cerdanya", "Puigcerdà"],
+                ["Conca de Barberà", "Montblanc"],
+                ["Garraf", "Vilanova i la Geltrú"],
+                ["Garrigues", "les Borges Blanques"],
+                ["Garrotxa", "Olot"],
+                ["Gironès", "Girona"],
+                ["Lluçanès", "Prats de Lluçanès"],
+                ["Maresme", "Mataró"],
+                ["Moianès", "Moià"],
+                ["Montsià", "Amposta"],
+                ["Noguera", "Balaguer"],
+                ["Osona", "Vic"],
+                ["Pallars Jussà", "Tremp"],
+                ["Pallars Sobirà", "Sort"],
+                ["Pla d'Urgell", "Mollerussa"],
+                ["Pla de l'Estany", "Banyoles"],
+                ["Priorat", "Falset"],
+                ["Ribera d'Ebre", "Móra d'Ebre"],
+                ["Ripollès", "Ripoll"],
+                ["Segarra", "Cervera"],
+                ["Segrià", "Lleida"],
+                ["Selva", "Santa Coloma de Farners"],
+                ["Solsonès", "Solsona"],
+                ["Tarragonès", "Tarragona"],
+                ["Terra Alta", "Gandesa"],
+                ["Urgell", "Tàrrega"],
+                ["Val d'Aran", "Vielha"],
+                ["Vallès Occidental", "Sabadell i Terrassa"],
+                ["Vallès Oriental", "Granollers"]
             ];
+            const fields = ["name", "capital", "number"];
+            const fieldLabels = {
+                name: "Comarca",
+                capital: "Capital",
+                number: "Número"
+            };
+            const comarcaData = comarques.map(([name, capital], index) => ({
+                name,
+                capital,
+                number: index + 1
+            }));
             const questions = document.querySelector("#questions");
             const quizTitle = document.querySelector("#quiz-title");
             const quizInstructions = document.querySelector("#quiz-instructions");
-            const quizMode = Math.random() < 0.5 ? "names" : "numbers";
+            const questionHeadings = document.querySelector("#question-headings");
 
             function shuffle(items) {
                 for (let index = items.length - 1; index > 0; index -= 1) {
@@ -226,32 +268,39 @@
             }
 
             function createQuestions() {
-                const isNameQuiz = quizMode === "names";
-                const prompts = isNameQuiz
-                    ? shuffle([...comarcaNames]).slice(0, 20)
-                    : shuffle(Array.from({ length: comarcaNames.length }, (_, index) => index + 1))
-                        .slice(0, 20);
+                const promptField = fields[Math.floor(Math.random() * fields.length)];
+                const answerFields = fields.filter((field) => field !== promptField);
+                const prompts = shuffle([...comarcaData]).slice(0, 18);
 
-                quizTitle.textContent = isNameQuiz
-                    ? "Escriu el número de cada comarca"
-                    : "Escriu el nom de cada comarca";
-                quizInstructions.textContent = isNameQuiz
-                    ? "Mira els números del mapa i escriu el número de cada comarca."
-                    : "Mira els números del mapa i escriu el nom de cada comarca.";
-                questions.dataset.mode = quizMode;
+                const clueDescription = {
+                    name: "del nom",
+                    capital: "de la capital",
+                    number: "del número"
+                };
+                quizTitle.textContent = `A partir ${clueDescription[promptField]}, completa les altres dades`;
+                quizInstructions.textContent = "Cada fila mostra només una dada de la comarca. Escriu les altres dues.";
+                questionHeadings.replaceChildren();
+                fields.forEach((field) => {
+                    const heading = document.createElement("span");
+                    heading.textContent = fieldLabels[field];
+                    questionHeadings.append(heading);
+                });
                 questions.replaceChildren();
-                prompts.forEach((prompt) => {
+                prompts.forEach((comarca) => {
                     const question = document.createElement("li");
-                    const promptText = document.createElement("span");
-                    const answer = document.createElement("span");
+                    fields.forEach((field) => {
+                        if (field === promptField) {
+                            const prompt = document.createElement("span");
+                            prompt.textContent = comarca[field];
+                            question.append(prompt);
+                            return;
+                        }
 
-                    promptText.textContent = prompt;
-                    answer.className = "answer-space";
-                    answer.setAttribute(
-                        "aria-label",
-                        isNameQuiz ? "Número de la comarca" : "Nom de la comarca"
-                    );
-                    question.append(promptText, answer);
+                        const answer = document.createElement("span");
+                        answer.className = "answer-space";
+                        answer.setAttribute("aria-label", fieldLabels[field]);
+                        question.append(answer);
+                    });
                     questions.append(question);
                 });
             }
