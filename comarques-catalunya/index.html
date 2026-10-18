@@ -161,6 +161,10 @@
                 figcaption {
                     font-size: 7pt;
                 }
+
+                .full-list-link {
+                    display: none;
+                }
             }
         </style>
     </head>
@@ -169,6 +173,7 @@
             <p class="index-link"><a href="../index.html">Torna a l’índex</a></p>
             <h1>Comarques de Catalunya</h1>
             <p class="instructions" id="quiz-instructions"></p>
+            <p class="full-list-link"><a href="llistat.html">llistat complert</a></p>
             <div class="worksheet">
                 <figure>
                     <img
@@ -197,52 +202,8 @@
             <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
             <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
         </footer>
+        <script src="comarques.js"></script>
         <script>
-            const comarques = [
-                ["Alt Camp", "Valls"],
-                ["Alt Empordà", "Figueres"],
-                ["Alt Penedès", "Vilafranca del Penedès"],
-                ["Alt Urgell", "la Seu d'Urgell"],
-                ["Alta Ribagorça", "el Pont de Suert"],
-                ["Anoia", "Igualada"],
-                ["Bages", "Manresa"],
-                ["Baix Camp", "Reus"],
-                ["Baix Ebre", "Tortosa"],
-                ["Baix Empordà", "la Bisbal d'Empordà"],
-                ["Baix Llobregat", "Sant Feliu de Llobregat"],
-                ["Baix Penedès", "el Vendrell"],
-                ["Barcelonès", "Barcelona"],
-                ["Berguedà", "Berga"],
-                ["Cerdanya", "Puigcerdà"],
-                ["Conca de Barberà", "Montblanc"],
-                ["Garraf", "Vilanova i la Geltrú"],
-                ["Garrigues", "les Borges Blanques"],
-                ["Garrotxa", "Olot"],
-                ["Gironès", "Girona"],
-                ["Lluçanès", "Prats de Lluçanès"],
-                ["Maresme", "Mataró"],
-                ["Moianès", "Moià"],
-                ["Montsià", "Amposta"],
-                ["Noguera", "Balaguer"],
-                ["Osona", "Vic"],
-                ["Pallars Jussà", "Tremp"],
-                ["Pallars Sobirà", "Sort"],
-                ["Pla d'Urgell", "Mollerussa"],
-                ["Pla de l'Estany", "Banyoles"],
-                ["Priorat", "Falset"],
-                ["Ribera d'Ebre", "Móra d'Ebre"],
-                ["Ripollès", "Ripoll"],
-                ["Segarra", "Cervera"],
-                ["Segrià", "Lleida"],
-                ["Selva", "Santa Coloma de Farners"],
-                ["Solsonès", "Solsona"],
-                ["Tarragonès", "Tarragona"],
-                ["Terra Alta", "Gandesa"],
-                ["Urgell", "Tàrrega"],
-                ["Val d'Aran", "Vielha"],
-                ["Vallès Occidental", "Sabadell i Terrassa"],
-                ["Vallès Oriental", "Granollers"]
-            ];
             const fields = ["name", "capital", "number"];
             const fieldLabels = {
                 name: "Comarca",
