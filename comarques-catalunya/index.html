@@ -33,10 +33,27 @@
                 margin: 0;
             }
 
+            .map-container {
+                position: relative;
+            }
+
             .map {
                 display: block;
                 height: auto;
                 width: 100%;
+            }
+
+            #letter-labels {
+                display: none;
+                height: 100%;
+                inset: 0;
+                pointer-events: none;
+                position: absolute;
+                width: 100%;
+            }
+
+            .worksheet[data-mode="letters"] #letter-labels {
+                display: block;
             }
 
             figcaption {
@@ -53,8 +70,13 @@
             #question-headings,
             #questions li {
                 display: grid;
-                grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.5fr) minmax(3rem, 0.45fr);
                 gap: 0.5rem;
+                grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.5fr) minmax(3rem, 0.45fr);
+            }
+
+            #question-headings.letter-mode,
+            #questions li.letter-mode {
+                grid-template-columns: 1.5rem minmax(0, 1fr) minmax(0, 1fr);
             }
 
             #question-headings {
@@ -128,9 +150,13 @@
                     grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
                 }
 
-                .map {
+                .map-container {
                     margin: 0 auto;
                     width: 90%;
+                }
+
+                .map {
+                    width: 100%;
                 }
 
                 #questions {
@@ -178,11 +204,15 @@
             <p class="map-link"><a href="mapa.html">Mapa per imprimir</a></p>
             <div class="worksheet">
                 <figure>
-                    <img
-                        class="map"
-                        src="comarques-catalunya-map.svg"
-                        alt="Mapa de Catalunya amb els límits de les 43 comarques, cadascuna identificada amb un número."
-                    >
+                    <div class="map-container">
+                        <img
+                            class="map"
+                            id="comarques-map"
+                            src="comarques-catalunya-map.svg"
+                            alt="Mapa de Catalunya amb els límits de les 43 comarques, cadascuna identificada amb un número."
+                        >
+                        <svg id="letter-labels" viewBox="0 0 800 720" aria-hidden="true"></svg>
+                    </div>
                     <figcaption>
                         Límits comarcals basats en dades de la Generalitat de Catalunya,
                         distribuïdes pel projecte
@@ -221,6 +251,28 @@
             const quizTitle = document.querySelector("#quiz-title");
             const quizInstructions = document.querySelector("#quiz-instructions");
             const questionHeadings = document.querySelector("#question-headings");
+            const worksheet = document.querySelector(".worksheet");
+            const map = document.querySelector("#comarques-map");
+            const letterLabels = document.querySelector("#letter-labels");
+            const letters = "abcdefghijklmnopqr";
+            const svgNamespace = "http://www.w3.org/2000/svg";
+            const mapMarkers = [
+                [307.9, 467.1, "#F4A098"], [657.0, 182.1, "#64933D"], [387.0, 446.3, "#FFD166"],
+                [326.5, 186.6, "#65ADE8"], [208.9, 121.1, "#65ADE8"], [360.7, 388.8, "#FFD166"],
+                [401.1, 338.0, "#FFD166"], [249.4, 503.7, "#F4A098"], [138.1, 598.2, "#F4A098"],
+                [684.7, 287.3, "#64933D"], [452.7, 458.3, "#FFD166"], [350.1, 474.0, "#F4A098"],
+                [488.4, 439.0, "#FFD166"], [424.6, 252.3, "#FFD166"], [406.6, 160.8, "#64933D"],
+                [270.0, 445.8, "#F4A098"], [411.8, 477.6, "#FFD166"], [213.8, 425.0, "#65ADE8"],
+                [564.2, 222.4, "#64933D"], [629.6, 280.0, "#64933D"], [468.3, 271.9, "#FFD166"],
+                [599.6, 365.9, "#FFD166"], [476.0, 336.5, "#FFD166"], [134.9, 654.6, "#F4A098"],
+                [203.4, 304.6, "#65ADE8"], [515.9, 293.2, "#FFD166"], [233.4, 226.0, "#65ADE8"],
+                [285.0, 108.6, "#65ADE8"], [219.0, 372.1, "#65ADE8"], [622.8, 237.6, "#64933D"],
+                [201.5, 486.6, "#F4A098"], [174.1, 549.9, "#F4A098"], [500.3, 186.8, "#64933D"],
+                [304.3, 365.6, "#65ADE8"], [153.9, 380.6, "#65ADE8"], [585.9, 320.2, "#64933D"],
+                [350.8, 259.8, "#65ADE8"], [308.2, 506.8, "#F4A098"], [111.1, 532.1, "#F4A098"],
+                [258.3, 391.2, "#65ADE8"], [204.0, 67.9, "#65ADE8"], [468.0, 401.3, "#FFD166"],
+                [526.5, 362.4, "#FFD166"]
+            ];
 
             function shuffle(items) {
                 for (let index = items.length - 1; index > 0; index -= 1) {
@@ -230,7 +282,10 @@
                 return items;
             }
 
-            function createQuestions() {
+            function createClueQuestions() {
+                worksheet.dataset.mode = "clues";
+                map.alt = "Mapa de Catalunya amb els límits de les 43 comarques, cadascuna identificada amb un número.";
+                letterLabels.replaceChildren();
                 const promptField = fields[Math.floor(Math.random() * fields.length)];
                 const answerFields = fields.filter((field) => field !== promptField);
                 const prompts = shuffle([...comarcaData]).slice(0, 18);
@@ -243,6 +298,7 @@
                 quizTitle.textContent = `A partir ${clueDescription[promptField]}, completa les altres dades`;
                 quizInstructions.textContent = "Cada fila mostra només una dada de la comarca. Escriu les altres dues.";
                 questionHeadings.replaceChildren();
+                questionHeadings.classList.remove("letter-mode");
                 fields.forEach((field) => {
                     const heading = document.createElement("span");
                     heading.textContent = fieldLabels[field];
@@ -266,6 +322,78 @@
                     });
                     questions.append(question);
                 });
+            }
+
+            function createLetterQuestions() {
+                worksheet.dataset.mode = "letters";
+                map.alt = "Mapa de Catalunya sense números, amb 18 comarques identificades amb lletres.";
+                quizTitle.textContent = "Escriu el nom de cada comarca i la seva capital";
+                quizInstructions.textContent = "Identifica al mapa les 18 comarques marcades amb lletres i completa'n el nom i la capital.";
+                questionHeadings.replaceChildren();
+                questionHeadings.classList.add("letter-mode");
+                [".", "Comarca", "Capital"].forEach((label) => {
+                    const heading = document.createElement("span");
+                    heading.textContent = label;
+                    questionHeadings.append(heading);
+                });
+
+                const prompts = shuffle([...comarcaData]).slice(0, letters.length);
+                letterLabels.replaceChildren();
+                mapMarkers.forEach(([x, y, fill]) => {
+                    const cover = document.createElementNS(svgNamespace, "circle");
+                    cover.setAttribute("cx", String(x));
+                    cover.setAttribute("cy", String(y));
+                    cover.setAttribute("r", "14");
+                    cover.setAttribute("fill", fill);
+                    letterLabels.append(cover);
+                });
+                prompts.forEach((comarca, index) => {
+                    const letter = letters[index];
+                    const [x, y] = mapMarkers[comarca.number - 1];
+                    const marker = document.createElementNS(svgNamespace, "g");
+                    const circle = document.createElementNS(svgNamespace, "circle");
+                    const label = document.createElementNS(svgNamespace, "text");
+                    circle.setAttribute("cx", String(x));
+                    circle.setAttribute("cy", String(y));
+                    circle.setAttribute("r", "13");
+                    circle.setAttribute("fill", "#fff");
+                    circle.setAttribute("stroke", "#263746");
+                    circle.setAttribute("stroke-width", "1.2");
+                    label.setAttribute("x", String(x));
+                    label.setAttribute("y", String(y + 4.5));
+                    label.setAttribute("text-anchor", "middle");
+                    label.setAttribute("font-family", "Arial, sans-serif");
+                    label.setAttribute("font-size", "14");
+                    label.setAttribute("font-weight", "700");
+                    label.setAttribute("fill", "#172b3a");
+                    label.textContent = letter;
+                    marker.append(circle, label);
+                    letterLabels.append(marker);
+                });
+
+                questions.replaceChildren();
+                prompts.forEach((comarca, index) => {
+                    const question = document.createElement("li");
+                    const letter = document.createElement("span");
+                    letter.textContent = letters[index];
+                    question.classList.add("letter-mode");
+                    question.append(letter);
+                    ["name", "capital"].forEach((field) => {
+                        const answer = document.createElement("span");
+                        answer.className = "answer-space";
+                        answer.setAttribute("aria-label", fieldLabels[field]);
+                        question.append(answer);
+                    });
+                    questions.append(question);
+                });
+            }
+
+            function createQuestions() {
+                if (Math.random() < 0.5) {
+                    createLetterQuestions();
+                    return;
+                }
+                createClueQuestions();
             }
 
             document.querySelector("#new-questions").addEventListener("click", createQuestions);
