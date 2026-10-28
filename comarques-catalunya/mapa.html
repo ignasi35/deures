@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Mapa de les comarques de Catalunya</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.4;
+                margin: 2rem auto;
+                max-width: 74rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 0.75rem;
+            }
+
+            figure {
+                margin: 0;
+                text-align: center;
+            }
+
+            .map {
+                display: block;
+                height: auto;
+                margin: 0 auto;
+                width: 100%;
+            }
+
+            figcaption {
+                color: #555;
+                font-size: 0.75rem;
+                margin-top: 0.4rem;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .actions {
+                margin-top: 1.5rem;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media print {
+                @page {
+                    size: A4 landscape;
+                    margin: 8mm;
+                }
+
+                body {
+                    color: #000;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                .index-link,
+                h1,
+                .actions,
+                footer {
+                    display: none;
+                }
+
+                .map {
+                    max-height: 190mm;
+                    max-width: 100%;
+                    width: auto;
+                }
+
+                figcaption {
+                    font-size: 6pt;
+                    margin-top: 1mm;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <p class="index-link">
+                <a href="index.html">Torna als deures</a> ·
+                <a href="llistat.html">Llistat complet</a>
+            </p>
+            <h1>Mapa de les comarques de Catalunya</h1>
+            <figure>
+                <img
+                    class="map"
+                    src="comarques-catalunya-map.svg"
+                    alt="Mapa de Catalunya amb els límits de les 43 comarques, cadascuna identificada amb un número."
+                >
+                <figcaption>
+                    Límits comarcals basats en dades de la Generalitat de Catalunya,
+                    distribuïdes pel projecte
+                    <a href="https://github.com/psauleda/Comarques-de-Catalunya">Comarques de Catalunya</a>.
+                </figcaption>
+            </figure>
+            <div class="actions">
+                <button id="print-map" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
+        <script>
+            document.querySelector("#print-map").addEventListener("click", () => window.print());
+        </script>
+    </body>
+</html>
