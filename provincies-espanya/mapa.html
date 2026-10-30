@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Mapa numerat de les províncies d’Espanya</title>
+        <link rel="stylesheet" href="../geografia/estils.css">
+    </head>
+    <body class="full-map-page province-reference-map">
+        <main>
+            <p class="index-link"><a href="index.html">Torna a l’exercici</a> · <a href="llistat.html">Llistat de províncies i capitals</a></p>
+            <h1>Mapa numerat de les províncies d’Espanya</h1>
+            <figure class="full-map-figure">
+                <div class="map-container">
+                    <img id="exercise-map" class="map" src="mapa.svg" alt="">
+                    <svg id="map-labels" aria-hidden="true"></svg>
+                </div>
+                <figcaption>
+                    Els números corresponen al llistat de províncies.
+                    Fronteres adaptades del conjunt de dades
+                    <a href="https://github.com/codeforgermany/click_that_hood">Click That Hood</a> (MIT).
+                </figcaption>
+            </figure>
+            <div class="actions">
+                <button id="print-map" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <script src="provincies.js"></script>
+        <script src="../geografia/mapa-numerat.js"></script>
+        <script src="../geografia/imprimeix-mapa.js"></script>
+    </body>
+</html>
