@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Mapa d’Amèrica</title>
+        <link rel="stylesheet" href="../../geografia/estils.css">
+    </head>
+    <body class="full-map-page country-reference-map">
+        <main>
+            <p class="index-link"><a href="index.html">Torna a l’exercici d’Amèrica</a> · <a href="llistat.html">Llistat de països i capitals</a></p>
+            <h1>Mapa d’Amèrica</h1>
+            <figure class="full-map-figure">
+                <div class="full-map-container">
+                    <img class="full-map" src="mapa.svg" alt="Mapa numerat d’Amèrica amb els països delimitats.">
+                    <svg id="map-labels" aria-hidden="true"></svg>
+                </div>
+                <figcaption>
+                    Requadre inferior esquerre: Amèrica Central i el Carib ampliats.
+                    Mapa de <a href="https://www.naturalearthdata.com/">Natural Earth</a> (domini públic).
+                </figcaption>
+            </figure>
+            <div class="actions">
+                <button id="print-map" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <script src="../../geografia/paisos.js"></script>
+        <script>window.geographyExercise = window.geographyWorld.america;</script>
+        <script src="../../geografia/numeros-mapa-paisos.js"></script>
+        <script src="../../geografia/imprimeix-mapa.js"></script>
+    </body>
+</html>
