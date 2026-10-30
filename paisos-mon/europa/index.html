@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Països d’Europa</title>
+        <link rel="stylesheet" href="../../geografia/estils.css">
+    </head>
+    <body>
+        <main>
+            <p class="index-link"><a href="../index.html">Torna a continents</a></p>
+            <h1>Països d’Europa</h1>
+            <p id="quiz-instructions" class="instructions"></p>
+            <p class="full-list-link"><a href="llistat.html">Llistat de països i capitals</a></p>
+            <p class="map-link"><a href="mapa.html">Mapa a mida completa</a></p>
+            <div class="worksheet">
+                <figure>
+                    <div class="map-container">
+                        <img id="exercise-map" class="map" src="mapa.svg" alt="">
+                        <svg id="map-labels" aria-hidden="true"></svg>
+                    </div>
+                    <figcaption>
+                        Mapa de <a href="https://www.naturalearthdata.com/">Natural Earth</a> (domini públic).
+                        Noms i capitals de <a href="https://github.com/umpirsky/country-list">country-list</a>
+                        (MIT) i <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0).
+                        Selecció de països independents basada en
+                        <a href="https://github.com/mledoze/countries">Countries</a> (ODbL).
+                    </figcaption>
+                </figure>
+                <section aria-labelledby="quiz-title">
+                    <h2 id="quiz-title"></h2>
+                    <div id="question-headings"></div>
+                    <ol id="questions"></ol>
+                </section>
+            </div>
+            <div class="actions">
+                <button id="new-questions" type="button">Nous exercicis</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
+        <script src="../../geografia/paisos.js"></script>
+        <script>window.geographyExercise = window.geographyWorld.europa;</script>
+        <script src="../../geografia/exercici.js"></script>
+    </body>
+</html>
