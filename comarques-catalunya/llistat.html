@@ -163,7 +163,7 @@
         <script src="comarques.js"></script>
         <script>
             const comarcaList = document.querySelector("#comarca-list");
-            comarques.forEach(([name, capital], index) => {
+            window.geographyExercise.entries.forEach(({name, capital}, index) => {
                 const row = document.createElement("tr");
                 [index + 1, name, capital].forEach((value) => {
                     const cell = document.createElement("td");

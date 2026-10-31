@@ -5,3 +5,8 @@
 .beads-credential-key
 .beads/proxieddb/
 *.gate.lock*
+
+# Node test dependencies and reports
+node_modules/
+playwright-report/
+test-results/
