@@ -33,6 +33,7 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     expect(pageErrors).toEqual([]);
 
     await page.goto("/comarques-catalunya/llistat.html");
+    await page.setViewportSize({width: 666, height: 983});
     const counties = await page.evaluate(() =>
         window.geographyExercise.entries.map(({name, capital, province}, index) => ({
             number: String(index + 1),
@@ -94,7 +95,7 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     );
     await expect(page.locator(".maps > figure")).toHaveCount(2);
     await expect(page.locator(".maps")).toHaveCSS("position", "sticky");
-    await expect(page.locator(".maps")).toHaveCSS("grid-template-columns", /.+ .+/);
+    await expect(page.locator(".maps")).toHaveCSS("grid-template-columns", /.+/);
     for (const map of await page.locator(".maps .map").all()) {
         await expect.poll(() => map.evaluate(
             image => image.complete && image.naturalWidth > 0
@@ -132,6 +133,18 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     expect(numberedMapLayout.containerPosition).toBe("relative");
     expect(numberedMapLayout.labelsPosition).toBe("absolute");
     expect(numberedMapLayout.labels).toEqual(numberedMapLayout.image);
+    const mapOrder = await page.locator(".maps > figure").evaluateAll(figures =>
+        figures.map(figure => figure.getBoundingClientRect().toJSON())
+    );
+    expect(mapOrder[0].height).toBeGreaterThan(0);
+    expect(mapOrder[1].height).toBeGreaterThan(0);
+    expect(mapOrder[0].bottom).toBeLessThan(mapOrder[1].top);
+    const referenceListLayout = await page.locator(".worksheet").evaluate(worksheet => {
+        const maps = worksheet.querySelector(".maps").getBoundingClientRect();
+        const list = worksheet.querySelector("table").getBoundingClientRect();
+        return {maps, list};
+    });
+    expect(referenceListLayout.list.left).toBeGreaterThan(referenceListLayout.maps.right);
     const referenceMarkerSizes = await page.locator("#map-labels circle").evaluateAll(circles =>
         [...new Set(circles.map(circle => circle.getAttribute("r")))]
     );
@@ -145,6 +158,21 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     );
     expect(stickyMapPosition).toBeGreaterThanOrEqual(0);
     expect(stickyMapPosition).toBeLessThan(32);
+    await page.emulateMedia({media: "print"});
+    await expect(page.locator(".maps")).toHaveCSS("position", "static");
+    const printStyles = await page.evaluate(() => {
+        const rules = [...document.styleSheets].flatMap(sheet => [...sheet.cssRules]);
+        const printRules = rules.find(rule => rule.type === CSSRule.MEDIA_RULE && rule.conditionText === "print");
+        return {
+            pageSize: printRules.cssRules[0].style.getPropertyValue("size"),
+            mapsColumns: [...printRules.cssRules].find(rule =>
+                rule.selectorText === ".maps"
+            ).style.getPropertyValue("grid-template-columns"),
+        };
+    });
+    expect(printStyles.pageSize).toBe("a4");
+    expect(printStyles.mapsColumns).toBe("1fr");
+    await page.emulateMedia({media: "screen"});
     await page.locator("#print-list").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
 
@@ -159,6 +187,41 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     await page.locator("#print-map").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
     expect(pageErrors).toEqual([]);
+});
+
+test("all printable pages use portrait orientation", async ({page}) => {
+    const printablePages = [
+        "/",
+        "/provincies-espanya/index.html",
+        "/provincies-espanya/llistat.html",
+        "/provincies-espanya/mapa.html",
+        "/comarques-catalunya/index.html",
+        "/comarques-catalunya/llistat.html",
+        "/comarques-catalunya/mapa.html",
+        "/paisos-mon/index.html",
+        ...["africa", "america", "asia", "europa", "oceania"].flatMap(continent => [
+            `/paisos-mon/${continent}/index.html`,
+            `/paisos-mon/${continent}/llistat.html`,
+            `/paisos-mon/${continent}/mapa.html`,
+        ]),
+        "/taules-multiplicar/index.html",
+        "/taules-multiplicar/multiplicacions-grans.html",
+        "/caligrafia/index.html",
+    ];
+
+    for (const path of printablePages) {
+        await page.goto(path);
+        const pdf = await page.pdf({preferCSSPageSize: true});
+        const pageSizes = [...pdf.toString("latin1").matchAll(
+            /\/MediaBox\s*\[\s*(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s*\]/g
+        )].map(([, left, bottom, right, top]) => ({
+            width: Number(right) - Number(left),
+            height: Number(top) - Number(bottom),
+        }));
+
+        expect(pageSizes, `${path} should produce a PDF with page dimensions`).not.toHaveLength(0);
+        expect(pageSizes.every(({width, height}) => height > width), path).toBe(true);
+    }
 });
 
 test("multiplication table: generates 40 distinct facts from 1 to 9", async ({page}) => {
