@@ -93,6 +93,8 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
         counties.map(county => `${county.number}: ${county.name}`)
     );
     await expect(page.locator(".maps > figure")).toHaveCount(2);
+    await expect(page.locator(".maps")).toHaveCSS("position", "sticky");
+    await expect(page.locator(".maps")).toHaveCSS("grid-template-columns", /.+ .+/);
     for (const map of await page.locator(".maps .map").all()) {
         await expect.poll(() => map.evaluate(
             image => image.complete && image.naturalWidth > 0
@@ -136,6 +138,13 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     expect(referenceMarkerSizes).toEqual(["18"]);
     await expect(page.locator(".maps > figure").nth(1).locator(".map"))
         .toHaveAttribute("alt", "Mapa de Catalunya amb les 43 comarques identificades amb números.");
+    const lastCountyRow = page.locator("#comarca-list .comarca-row").last();
+    await lastCountyRow.scrollIntoViewIfNeeded();
+    const stickyMapPosition = await page.locator(".maps").evaluate(maps =>
+        maps.getBoundingClientRect().top
+    );
+    expect(stickyMapPosition).toBeGreaterThanOrEqual(0);
+    expect(stickyMapPosition).toBeLessThan(32);
     await page.locator("#print-list").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
 
