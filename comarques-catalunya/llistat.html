@@ -26,13 +26,31 @@
                 grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
             }
 
+            .maps {
+                display: grid;
+                gap: 1rem;
+            }
+
             figure {
                 margin: 0;
+            }
+
+            .map-container {
+                position: relative;
             }
 
             .map {
                 display: block;
                 height: auto;
+                width: 100%;
+            }
+
+            #map-labels {
+                display: block;
+                height: 100%;
+                inset: 0;
+                pointer-events: none;
+                position: absolute;
                 width: 100%;
             }
 
@@ -60,6 +78,12 @@
                 width: 2.5rem;
             }
 
+            .province-heading th {
+                background: #f0f0f0;
+                padding-top: 0.45rem;
+                text-align: left;
+            }
+
             footer {
                 font-size: 0.75rem;
                 margin-top: 1rem;
@@ -73,7 +97,7 @@
 
             @media print {
                 @page {
-                    size: A4 portrait;
+                    size: A4 landscape;
                     margin: 8mm;
                 }
 
@@ -97,12 +121,16 @@
                 }
 
                 .worksheet {
-                    gap: 6mm;
-                    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+                    gap: 5mm;
+                    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+                }
+
+                .maps {
+                    gap: 2mm;
                 }
 
                 .map {
-                    max-height: 165mm;
+                    max-height: 83mm;
                     width: 100%;
                 }
 
@@ -129,18 +157,33 @@
             <p class="index-link"><a href="mapa.html">Mapa per imprimir</a></p>
             <h1>Llistat complet de comarques de Catalunya</h1>
             <div class="worksheet">
-                <figure>
-                    <img
-                        class="map"
-                        src="comarques-catalunya-map.svg"
-                        alt="Mapa de Catalunya amb els límits de les 43 comarques, cadascuna identificada amb un número."
-                    >
-                    <figcaption>
-                        Límits comarcals basats en dades de la Generalitat de Catalunya,
-                        distribuïdes pel projecte
-                        <a href="https://github.com/psauleda/Comarques-de-Catalunya">Comarques de Catalunya</a>.
-                    </figcaption>
-                </figure>
+                <div class="maps">
+                    <figure>
+                        <div class="map-container">
+                            <img
+                                class="map"
+                                src="comarques-catalunya-map.svg"
+                                alt="Mapa de Catalunya amb els límits de les comarques, sense números."
+                            >
+                        </div>
+                    </figure>
+                    <figure>
+                        <div class="map-container">
+                            <img
+                                id="exercise-map"
+                                class="map"
+                                src="comarques-catalunya-map.svg"
+                                alt="Mapa de Catalunya amb les 43 comarques identificades amb números."
+                            >
+                            <svg id="map-labels" aria-hidden="true"></svg>
+                        </div>
+                        <figcaption>
+                            Límits comarcals basats en dades de la Generalitat de Catalunya,
+                            distribuïdes pel projecte
+                            <a href="https://github.com/psauleda/Comarques-de-Catalunya">Comarques de Catalunya</a>.
+                        </figcaption>
+                    </figure>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -161,16 +204,34 @@
             <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
         </footer>
         <script src="comarques.js"></script>
+        <script src="../geografia/mapa-numerat.js"></script>
         <script>
             const comarcaList = document.querySelector("#comarca-list");
-            window.geographyExercise.entries.forEach(({name, capital}, index) => {
-                const row = document.createElement("tr");
-                [index + 1, name, capital].forEach((value) => {
-                    const cell = document.createElement("td");
-                    cell.textContent = value;
-                    row.append(cell);
-                });
-                comarcaList.append(row);
+
+            const provinceGroups = ["Barcelona", "Girona", "Lleida", "Tarragona"];
+            provinceGroups.forEach((province) => {
+                const heading = document.createElement("tr");
+                heading.className = "province-heading";
+                const headingCell = document.createElement("th");
+                headingCell.scope = "rowgroup";
+                headingCell.colSpan = 3;
+                headingCell.textContent = province;
+                heading.append(headingCell);
+                comarcaList.append(heading);
+
+                window.geographyExercise.entries
+                    .filter((entry) => entry.province === province)
+                    .forEach((entry) => {
+                        const row = document.createElement("tr");
+                        row.className = "comarca-row";
+                        const number = window.geographyExercise.entries.indexOf(entry) + 1;
+                        [number, entry.name, entry.capital].forEach((value) => {
+                            const cell = document.createElement("td");
+                            cell.textContent = String(value);
+                            row.append(cell);
+                        });
+                        comarcaList.append(row);
+                    });
             });
 
             document.querySelector("#print-list").addEventListener("click", () => window.print());

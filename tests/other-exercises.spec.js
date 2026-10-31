@@ -34,22 +34,108 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
 
     await page.goto("/comarques-catalunya/llistat.html");
     const counties = await page.evaluate(() =>
-        window.geographyExercise.entries.map(({name, capital}) => [name, capital])
+        window.geographyExercise.entries.map(({name, capital, province}, index) => ({
+            number: String(index + 1),
+            name,
+            capital,
+            province,
+        }))
     );
+    const groups = await page.locator("#comarca-list").evaluate(tbody => {
+        const provinces = [];
+        const rows = [];
+        let currentProvince;
+        for (const row of tbody.rows) {
+            const heading = row.querySelector("th");
+            if (heading) {
+                currentProvince = heading.textContent;
+                provinces.push(currentProvince);
+                continue;
+            }
+            rows.push({
+                province: currentProvince,
+                number: row.cells[0].textContent,
+                name: row.cells[1].textContent,
+                capital: row.cells[2].textContent,
+            });
+        }
+        return {provinces, rows};
+    });
+    const provinceOrder = ["Barcelona", "Girona", "Lleida", "Tarragona"];
     expect(counties).toHaveLength(43);
-    await expect(page.locator("#comarca-list tr")).toHaveCount(43);
-    const rows = await page.locator("#comarca-list tr").all();
-    const displayedRows = await Promise.all(rows.map(async row => (
-        await row.locator("td").allInnerTexts()
-    )));
-    expect(displayedRows).toEqual(counties.map(([name, capital], index) => [
-        String(index + 1),
-        name,
-        capital,
-    ]));
-    await expect.poll(() => page.locator(".map").evaluate(
-        image => image.complete && image.naturalWidth > 0
-    )).toBe(true);
+    expect(groups.provinces).toEqual(provinceOrder);
+    expect(groups.rows).toHaveLength(43);
+    expect(groups.rows).toEqual(provinceOrder.flatMap(province =>
+        counties.filter(county => county.province === province)
+    ));
+    expect(Object.fromEntries(provinceOrder.map(province => [
+        province,
+        groups.rows.filter(row => row.province === province).length,
+    ]))).toEqual({
+        Barcelona: 13,
+        Girona: 8,
+        Lleida: 12,
+        Tarragona: 10,
+    });
+    const mapMarkers = await page.locator("#map-labels > g").evaluateAll(markers =>
+        markers.map(marker => ({
+            number: marker.querySelector("text").textContent,
+            radius: marker.querySelector("circle").getAttribute("r"),
+            label: marker.querySelector("title").textContent,
+        }))
+    );
+    expect(mapMarkers).toHaveLength(43);
+    expect(mapMarkers.map(marker => marker.number)).toEqual(
+        counties.map(county => county.number)
+    );
+    expect(mapMarkers.every(marker => marker.radius === "18")).toBe(true);
+    expect(mapMarkers.map(marker => marker.label)).toEqual(
+        counties.map(county => `${county.number}: ${county.name}`)
+    );
+    await expect(page.locator(".maps > figure")).toHaveCount(2);
+    for (const map of await page.locator(".maps .map").all()) {
+        await expect.poll(() => map.evaluate(
+            image => image.complete && image.naturalWidth > 0
+        )).toBe(true);
+    }
+    await expect(page.locator(".maps > figure").nth(0).locator("#map-labels"))
+        .toHaveCount(0);
+    await expect(page.locator(".maps > figure").nth(0).locator(".map"))
+        .toHaveAttribute("alt", "Mapa de Catalunya amb els límits de les comarques, sense números.");
+    await expect(page.locator(".maps > figure").nth(1).locator("#map-labels > g > circle"))
+        .toHaveCount(43);
+    const numberedMapLayout = await page.locator(".maps > figure").nth(1)
+        .locator(".map-container").evaluate(container => {
+            const image = container.querySelector("img");
+            const labels = container.querySelector("svg");
+            const imageBounds = image.getBoundingClientRect();
+            const labelsBounds = labels.getBoundingClientRect();
+            return {
+                containerPosition: getComputedStyle(container).position,
+                labelsPosition: getComputedStyle(labels).position,
+                image: {
+                    left: imageBounds.left,
+                    top: imageBounds.top,
+                    right: imageBounds.right,
+                    bottom: imageBounds.bottom,
+                },
+                labels: {
+                    left: labelsBounds.left,
+                    top: labelsBounds.top,
+                    right: labelsBounds.right,
+                    bottom: labelsBounds.bottom,
+                },
+            };
+        });
+    expect(numberedMapLayout.containerPosition).toBe("relative");
+    expect(numberedMapLayout.labelsPosition).toBe("absolute");
+    expect(numberedMapLayout.labels).toEqual(numberedMapLayout.image);
+    const referenceMarkerSizes = await page.locator("#map-labels circle").evaluateAll(circles =>
+        [...new Set(circles.map(circle => circle.getAttribute("r")))]
+    );
+    expect(referenceMarkerSizes).toEqual(["18"]);
+    await expect(page.locator(".maps > figure").nth(1).locator(".map"))
+        .toHaveAttribute("alt", "Mapa de Catalunya amb les 43 comarques identificades amb números.");
     await page.locator("#print-list").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
 

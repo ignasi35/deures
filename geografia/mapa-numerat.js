@@ -8,7 +8,7 @@
 
     const svgNamespace = "http://www.w3.org/2000/svg";
     labels.setAttribute("viewBox", data.viewBox);
-    map.alt = data.mapAlt;
+    map.alt = data.referenceMapAlt || data.mapAlt;
 
     data.entries.forEach((entry) => {
         const position = entry.markerPosition || entry.insetMarker || entry;
@@ -33,7 +33,7 @@
         const title = document.createElementNS(svgNamespace, "title");
         const number = String(index + 1);
         const position = entry.markerPosition || entry.insetMarker || entry;
-        const radius = data.markerRadius || 13;
+        const radius = data.referenceMarkerRadius || data.markerRadius || 13;
 
         circle.setAttribute("cx", String(position.x));
         circle.setAttribute("cy", String(position.y));
@@ -45,7 +45,9 @@
         text.setAttribute("y", String(position.y + radius * 0.34));
         text.setAttribute("text-anchor", "middle");
         text.setAttribute("font-family", "Arial, sans-serif");
-        text.setAttribute("font-size", String(data.markerFontSize || 12));
+        text.setAttribute("font-size", String(
+            data.referenceMarkerFontSize || data.markerFontSize || 12
+        ));
         text.setAttribute("font-weight", "700");
         text.setAttribute("fill", "#172b3a");
         text.textContent = number;
