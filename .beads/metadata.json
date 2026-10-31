@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "deures",
+  "project_id": "c570cfc9-6b49-48be-95b0-116281a5c372"
+}
