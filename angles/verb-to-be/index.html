@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Verb to be | Anglès</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.5;
+                margin: 2rem auto;
+                max-width: 48rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .student-info {
+                display: flex;
+                gap: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .student-info span {
+                border-bottom: 1px solid #777;
+                flex: 1;
+            }
+
+            #exercises {
+                display: grid;
+                gap: 0.65rem 2rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #exercises li {
+                break-inside: avoid;
+            }
+
+            .sentence {
+                font-size: 1.1rem;
+                margin: 0;
+            }
+
+            .answer-space {
+                border-bottom: 1px solid #777;
+                display: inline-block;
+                min-width: 4.5rem;
+            }
+
+            .negative-hint {
+                color: #c00;
+                font-weight: 700;
+                margin-right: 0.35rem;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 2rem;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media (max-width: 32rem) {
+                #exercises {
+                    grid-template-columns: 1fr;
+                }
+
+                .student-info {
+                    gap: 1rem;
+                }
+            }
+
+            @media print {
+                @page {
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 12pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                }
+
+                .student-info {
+                    margin: 1rem 0;
+                }
+
+                #exercises {
+                    gap: 0.45rem 1.5rem;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                .sentence {
+                    font-size: 11pt;
+                }
+
+                .actions,
+                .index-link {
+                    display: none;
+                }
+
+                footer {
+                    font-size: 8pt;
+                    margin-top: 0.5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <p class="index-link"><a href="../index.html">Torna als exercicis d’anglès</a></p>
+            <h1>Verb to be</h1>
+            <p class="instructions">Completa cada espai amb el verb que falta (<em>am</em>, <em>is</em> o <em>are</em>) o amb el pronom o subjecte que falta.</p>
+            <p class="student-info">
+                Nom: <span></span>
+                Data: <span></span>
+            </p>
+            <ol id="exercises" aria-label="Exercicis del verb to be"></ol>
+            <div class="actions">
+                <button id="new-worksheet" type="button">Nous exercicis</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
+        <script>
+            const exercises = document.querySelector("#exercises");
+            const newWorksheetButton = document.querySelector("#new-worksheet");
+            const printWorksheetButton = document.querySelector("#print-worksheet");
+
+            const subjects = [
+                {text: "I", person: "first", number: "singular"},
+                {text: "You", person: "second", number: "singular"},
+                {text: "She", person: "third", number: "singular"},
+                {text: "George", person: "third", number: "singular"},
+                {text: "My mum and I", person: "first", number: "plural"},
+                {text: "You and Sam", person: "second", number: "plural"},
+                {text: "They", person: "third", number: "plural"},
+                {text: "The dogs", person: "third", number: "plural"},
+            ];
+            const forms = [
+                {name: "affirmative"},
+                {name: "negative"},
+                {name: "question"},
+            ];
+            const predicates = [
+                "happy", "at school", "in the park", "with a cat", "good at football",
+                "ready to play", "on the red team", "near the dogs", "in the pool",
+                "good at tennis", "wearing blue", "very fast", "with a ball", "at the zoo",
+                "under a big tree", "excited about the game", "next to a rabbit",
+                "on the green team", "good at basketball", "with a little dog",
+            ];
+            let previousWorksheet = "";
+
+            function shuffle(items) {
+                for (let index = items.length - 1; index > 0; index -= 1) {
+                    const randomIndex = Math.floor(Math.random() * (index + 1));
+                    [items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+                }
+                return items;
+            }
+
+            function createWorksheet() {
+                const questions = shuffle(subjects.flatMap(subject =>
+                    forms.map(form => ({
+                        ...subject,
+                        form,
+                        predicate: predicates[Math.floor(Math.random() * predicates.length)],
+                    }))
+                ));
+                forms.forEach(form => {
+                    shuffle(questions.filter(question => question.form.name === form.name))
+                        .forEach((question, index) => {
+                            question.missing = index < subjects.length / 2 ? "verb" : "subject";
+                        });
+                });
+                const negativeVerbQuestions = shuffle(questions.filter(question =>
+                    question.form.name === "negative" && question.missing === "verb"
+                ));
+                const negativeHints = new Set(negativeVerbQuestions.slice(0, 2));
+                let signature = JSON.stringify(questions);
+
+                if (signature === previousWorksheet) {
+                    const alternative = (predicates.indexOf(questions[0].predicate) + 1) % predicates.length;
+                    questions[0].predicate = predicates[alternative];
+                    signature = JSON.stringify(questions);
+                }
+                previousWorksheet = signature;
+
+                exercises.replaceChildren();
+                questions.forEach(question => {
+                    const {text, person, number, form, predicate, missing} = question;
+                    const item = document.createElement("li");
+                    const sentence = document.createElement("p");
+                    const answer = document.createElement("span");
+                    const verb = person === "first" && number === "singular"
+                        ? "am"
+                        : number === "singular" && person === "third"
+                            ? "is"
+                            : "are";
+
+                    item.dataset.person = person;
+                    item.dataset.number = number;
+                    item.dataset.form = form.name;
+                    item.dataset.subject = text.toLowerCase();
+                    item.dataset.predicate = predicate;
+                    item.dataset.missing = missing;
+                    item.dataset.negativeHint = String(negativeHints.has(question));
+                    sentence.className = "sentence";
+                    answer.className = "answer-space";
+                    answer.setAttribute(
+                        "aria-label",
+                        missing === "verb" ? "Verb que falta" : "Subjecte que falta"
+                    );
+
+                    if (negativeHints.has(question)) {
+                        const hint = document.createElement("span");
+                        hint.className = "negative-hint";
+                        hint.setAttribute("aria-label", "La frase ha de ser negativa");
+                        hint.textContent = "X";
+                        sentence.append(hint, " ");
+                    }
+
+                    if (form.name === "question") {
+                        if (missing === "verb") {
+                            const questionSubject = text === "I" || text === "George"
+                                ? text
+                                : `${text[0].toLowerCase()}${text.slice(1)}`;
+                            sentence.append(answer, ` ${questionSubject} ${predicate}?`);
+                        } else {
+                            sentence.append(
+                                `${verb[0].toUpperCase()}${verb.slice(1)} `,
+                                answer,
+                                ` ${predicate}?`
+                            );
+                        }
+                    } else if (missing === "verb") {
+                        sentence.append(`${text} `, answer);
+                        if (form.name === "negative" && !negativeHints.has(question)) {
+                            sentence.append(" not");
+                        }
+                        sentence.append(` ${predicate}.`);
+                    } else {
+                        sentence.append(answer, ` ${verb}`);
+                        if (form.name === "negative") {
+                            sentence.append(" not");
+                        }
+                        sentence.append(` ${predicate}.`);
+                    }
+
+                    item.append(sentence);
+                    exercises.append(item);
+                });
+            }
+
+            newWorksheetButton.addEventListener("click", createWorksheet);
+            printWorksheetButton.addEventListener("click", () => window.print());
+            createWorksheet();
+        </script>
+    </body>
+</html>

@@ -206,6 +206,7 @@ test("all printable pages use portrait orientation", async ({page}) => {
         ]),
         "/matematiques/taules-multiplicar/index.html",
         "/matematiques/taules-multiplicar/multiplicacions-grans.html",
+        "/angles/verb-to-be/index.html",
         "/lecto-escriptura/caligrafia/index.html",
     ];
 
