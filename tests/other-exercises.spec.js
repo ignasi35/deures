@@ -10,7 +10,7 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
             window.__printCalls += 1;
         };
     });
-    await page.goto("/comarques-catalunya/index.html");
+    await page.goto("/geografia/comarques-catalunya/index.html");
 
     await expect.poll(() => page.locator("#exercise-map").evaluate(
         image => image.complete && image.naturalWidth > 0
@@ -32,7 +32,7 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
     expect(pageErrors).toEqual([]);
 
-    await page.goto("/comarques-catalunya/llistat.html");
+    await page.goto("/geografia/comarques-catalunya/llistat.html");
     await page.setViewportSize({width: 666, height: 983});
     const counties = await page.evaluate(() =>
         window.geographyExercise.entries.map(({name, capital, province}, index) => ({
@@ -176,7 +176,7 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
     await page.locator("#print-list").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
 
-    await page.goto("/comarques-catalunya/mapa.html");
+    await page.goto("/geografia/comarques-catalunya/mapa.html");
     await expect.poll(() => page.locator(".map").evaluate(
         image => image.complete && image.naturalWidth > 0
     )).toBe(true);
@@ -192,21 +192,21 @@ test("comarques: exercise and reference pages contain all 43 counties", async ({
 test("all printable pages use portrait orientation", async ({page}) => {
     const printablePages = [
         "/",
-        "/provincies-espanya/index.html",
-        "/provincies-espanya/llistat.html",
-        "/provincies-espanya/mapa.html",
-        "/comarques-catalunya/index.html",
-        "/comarques-catalunya/llistat.html",
-        "/comarques-catalunya/mapa.html",
-        "/paisos-mon/index.html",
+        "/geografia/provincies-espanya/index.html",
+        "/geografia/provincies-espanya/llistat.html",
+        "/geografia/provincies-espanya/mapa.html",
+        "/geografia/comarques-catalunya/index.html",
+        "/geografia/comarques-catalunya/llistat.html",
+        "/geografia/comarques-catalunya/mapa.html",
+        "/geografia/paisos-mon/index.html",
         ...["africa", "america", "asia", "europa", "oceania"].flatMap(continent => [
-            `/paisos-mon/${continent}/index.html`,
-            `/paisos-mon/${continent}/llistat.html`,
-            `/paisos-mon/${continent}/mapa.html`,
+            `/geografia/paisos-mon/${continent}/index.html`,
+            `/geografia/paisos-mon/${continent}/llistat.html`,
+            `/geografia/paisos-mon/${continent}/mapa.html`,
         ]),
-        "/taules-multiplicar/index.html",
-        "/taules-multiplicar/multiplicacions-grans.html",
-        "/caligrafia/index.html",
+        "/matematiques/taules-multiplicar/index.html",
+        "/matematiques/taules-multiplicar/multiplicacions-grans.html",
+        "/lecto-escriptura/caligrafia/index.html",
     ];
 
     for (const path of printablePages) {
@@ -234,7 +234,7 @@ test("multiplication table: generates 40 distinct facts from 1 to 9", async ({pa
             window.__printCalls += 1;
         };
     });
-    await page.goto("/taules-multiplicar/");
+    await page.goto("/matematiques/taules-multiplicar/");
 
     await expect(page.locator('a[href="multiplicacions-grans.html"]')).toHaveCount(1);
     const readFacts = async () => page.locator("#exercises li").evaluateAll(items =>
@@ -275,7 +275,7 @@ test("multi-digit multiplication: generates ten two- or three-digit problems", a
             window.__printCalls += 1;
         };
     });
-    await page.goto("/taules-multiplicar/multiplicacions-grans.html");
+    await page.goto("/matematiques/taules-multiplicar/multiplicacions-grans.html");
 
     const readProblems = async () => page.locator("#exercises li").evaluateAll(items =>
         items.map(item => [...item.querySelectorAll(".factor")].map(factor => factor.textContent))
@@ -322,7 +322,7 @@ test("handwriting: displays four sentences, practice lines, and selectable fonts
             window.__printCalls += 1;
         };
     });
-    await page.goto("/caligrafia/");
+    await page.goto("/lecto-escriptura/caligrafia/");
 
     const sentences = page.locator("#sentences > li");
     await expect(sentences).toHaveCount(4);

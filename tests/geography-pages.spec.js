@@ -1,12 +1,12 @@
 const {test, expect} = require("@playwright/test");
 
 const exercises = [
-    {path: "provincies-espanya", entryCount: 50},
-    {path: "paisos-mon/europa", entryCount: 45},
-    {path: "paisos-mon/america", entryCount: 35, hasInset: true},
-    {path: "paisos-mon/africa", entryCount: 54},
-    {path: "paisos-mon/asia", entryCount: 47},
-    {path: "paisos-mon/oceania", entryCount: 14},
+    {path: "geografia/provincies-espanya", entryCount: 50},
+    {path: "geografia/paisos-mon/europa", entryCount: 45},
+    {path: "geografia/paisos-mon/america", entryCount: 35, hasInset: true},
+    {path: "geografia/paisos-mon/africa", entryCount: 54},
+    {path: "geografia/paisos-mon/asia", entryCount: 47},
+    {path: "geografia/paisos-mon/oceania", entryCount: 14},
 ];
 
 for (const {path, entryCount, hasInset = false} of exercises) {
