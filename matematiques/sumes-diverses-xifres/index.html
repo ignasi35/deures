@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Sumes de fins a 4 xifres</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.5;
+                margin: 2rem auto;
+                max-width: 48rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .student-info {
+                display: flex;
+                gap: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .student-info span {
+                border-bottom: 1px solid #777;
+                flex: 1;
+            }
+
+            #exercises {
+                display: grid;
+                grid-auto-flow: column;
+                gap: 2rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-rows: repeat(5, minmax(7rem, auto));
+                list-style: none;
+                margin: 0;
+                padding: 0 0 0 2rem;
+            }
+
+            #exercises li {
+                break-inside: avoid;
+            }
+
+            .problem {
+                font-family: monospace;
+                font-size: 1.7rem;
+                min-height: 7rem;
+                width: 7ch;
+            }
+
+            .number,
+            .number-digits {
+                display: grid;
+                grid-template-columns: repeat(var(--digits), 1.35ch);
+                justify-content: end;
+                width: 7ch;
+            }
+
+            .number {
+                line-height: 1.35;
+            }
+
+            .number-digits > span {
+                text-align: center;
+            }
+
+            .second-number {
+                position: relative;
+            }
+
+            .second-number::before {
+                content: "+";
+                left: -1.5ch;
+                position: absolute;
+            }
+
+            .result-line {
+                border-top: 1px solid #222;
+                margin-left: auto;
+                width: 7ch;
+            }
+
+            .answer-space {
+                height: 3.5rem;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 2rem;
+            }
+
+            .regenerate-button {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                position: fixed;
+                right: 0.75rem;
+                top: 0.75rem;
+                z-index: 1;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media (max-width: 32rem) {
+                #exercises {
+                    grid-auto-flow: row;
+                    grid-template-columns: 1fr;
+                    grid-template-rows: none;
+                }
+
+                .student-info {
+                    gap: 1rem;
+                }
+
+                #exercises {
+                    padding-left: 1rem;
+                }
+            }
+
+            @media print {
+                @page {
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 12pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                }
+
+                .student-info {
+                    margin: 1rem 0;
+                }
+
+                #exercises {
+                    gap: 2rem 1.5rem;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    padding-left: 1.5rem;
+                }
+
+                #exercises li {
+                    font-size: 11pt;
+                }
+
+                .problem {
+                    font-size: 16pt;
+                    min-height: 6rem;
+                }
+
+                .answer-space {
+                    height: 3rem;
+                }
+
+                .actions,
+                .page-links,
+                .regenerate-button {
+                    display: none;
+                }
+
+                footer {
+                    font-size: 8pt;
+                    margin-top: 0.5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <button id="regenerate-worksheet" class="regenerate-button" type="button">regenerar</button>
+            <p class="page-links"><a href="../index.html">Torna a l’índex de matemàtiques</a></p>
+            <h1>Sumes de fins a 4 xifres</h1>
+            <p class="instructions">Resol les 10 sumes. Cada nombre té com a màxim 4 xifres.</p>
+            <p class="student-info">
+                Nom: <span></span>
+                Data: <span></span>
+            </p>
+            <ol id="exercises" aria-label="Sumes de fins a quatre xifres"></ol>
+            <div class="actions">
+                <button id="new-worksheet" type="button">Nous exercicis</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
+        <script>
+            const exercises = document.querySelector("#exercises");
+            const newWorksheetButton = document.querySelector("#new-worksheet");
+            const regenerateButton = document.querySelector("#regenerate-worksheet");
+            const printWorksheetButton = document.querySelector("#print-worksheet");
+
+            function randomInteger(minimum, maximum) {
+                return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+            }
+
+            function createNumber() {
+                const digits = randomInteger(2, 4);
+                const minimum = 10 ** (digits - 1);
+                const maximum = 10 ** digits - 1;
+                return randomInteger(minimum, maximum);
+            }
+
+            function appendNumber(container, value) {
+                const digits = String(value);
+                container.style.setProperty("--digits", String(digits.length));
+                digits.split("").forEach(digit => {
+                    const digitElement = document.createElement("span");
+                    digitElement.textContent = digit;
+                    container.append(digitElement);
+                });
+            }
+
+            function createWorksheet() {
+                exercises.replaceChildren();
+
+                for (let index = 0; index < 10; index += 1) {
+                    const firstNumber = createNumber();
+                    const secondNumber = createNumber();
+                    const item = document.createElement("li");
+                    const problem = document.createElement("div");
+                    const firstRow = document.createElement("div");
+                    const firstDigits = document.createElement("div");
+                    const secondRow = document.createElement("div");
+                    const secondDigits = document.createElement("div");
+                    const resultLine = document.createElement("div");
+                    const answerSpace = document.createElement("div");
+
+                    item.dataset.firstNumber = String(firstNumber);
+                    item.dataset.secondNumber = String(secondNumber);
+                    problem.className = "problem";
+                    problem.setAttribute("aria-label", `${firstNumber} més ${secondNumber}`);
+                    firstRow.className = "number";
+                    secondRow.className = "number second-number";
+                    firstDigits.className = "number-digits";
+                    secondDigits.className = "number-digits";
+                    appendNumber(firstDigits, firstNumber);
+                    appendNumber(secondDigits, secondNumber);
+                    firstRow.append(firstDigits);
+                    secondRow.append(secondDigits);
+                    resultLine.className = "result-line";
+                    resultLine.setAttribute("aria-hidden", "true");
+                    answerSpace.className = "answer-space";
+                    problem.append(firstRow, secondRow, resultLine, answerSpace);
+                    item.append(problem);
+                    exercises.append(item);
+                }
+            }
+
+            newWorksheetButton.addEventListener("click", createWorksheet);
+            regenerateButton.addEventListener("click", createWorksheet);
+            printWorksheetButton.addEventListener("click", () => window.print());
+            createWorksheet();
+        </script>
+    </body>
+</html>

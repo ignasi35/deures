@@ -206,6 +206,10 @@ test("all printable pages use portrait orientation", async ({page}) => {
         ]),
         "/matematiques/taules-multiplicar/index.html",
         "/matematiques/taules-multiplicar/multiplicacions-grans.html",
+        "/matematiques/sumes-diverses-xifres/index.html",
+        "/matematiques/restes-diverses-xifres/index.html",
+        "/matematiques/divisions/dues-tres-xifres-un-digit.html",
+        "/matematiques/divisions/tres-quatre-xifres-un-dos-digits.html",
         "/angles/verb-to-be/index.html",
         "/lecto-escriptura/caligrafia/index.html",
     ];
@@ -313,6 +317,217 @@ test("multi-digit multiplication: generates ten two- or three-digit problems", a
     expect(pageErrors).toEqual([]);
 });
 
+test("multi-digit subtraction: most problems require borrowing and all stay positive", async ({page}) => {
+    const pageErrors = [];
+    page.on("pageerror", error => pageErrors.push(error.message));
+    await page.addInitScript(() => {
+        Math.random = () => 0;
+        window.__printCalls = 0;
+        window.print = () => {
+            window.__printCalls += 1;
+        };
+    });
+    await page.goto("/matematiques/restes-diverses-xifres/");
+
+    await expect(page.locator("#regenerate-worksheet")).toHaveText("regenerar");
+    const readProblems = () => page.locator("#exercises li").evaluateAll(items =>
+        items.map(item => ({
+            minuend: Number(item.dataset.minuend),
+            subtrahend: Number(item.dataset.subtrahend),
+            digits: item.querySelector(".number").textContent.length,
+            carryBoxes: item.querySelectorAll(".carry-box").length,
+            digitAlignment: (() => {
+                const boxes = [...item.querySelectorAll(".carry-box")];
+                const digits = [...item.querySelectorAll(".minuend-number > span")];
+                const lowerDigits = [...item.querySelectorAll(".subtrahend-digits > span")];
+                const alignedCenters = (elements, reference) => elements.every((element, index) => {
+                    const bounds = element.getBoundingClientRect();
+                    const referenceBounds = reference[index].getBoundingClientRect();
+                    return Math.abs(
+                        bounds.x + bounds.width / 2
+                        - referenceBounds.x - referenceBounds.width / 2
+                    ) < 1;
+                });
+                return alignedCenters(boxes, digits) && alignedCenters(lowerDigits, digits);
+            })(),
+            visibleNumbers: [...item.querySelectorAll(".number")].map(number =>
+                Number(number.textContent)
+            ),
+        }))
+    );
+    const requiresBorrowing = ({minuend, subtrahend}) => {
+        let borrow = 0;
+        let borrowedColumns = 0;
+        while (minuend > 0 || subtrahend > 0) {
+            const minuendDigit = minuend % 10;
+            const subtrahendDigit = subtrahend % 10;
+            if (minuendDigit - borrow < subtrahendDigit) {
+                borrow = 1;
+                borrowedColumns += 1;
+            } else {
+                borrow = 0;
+            }
+            minuend = Math.floor(minuend / 10);
+            subtrahend = Math.floor(subtrahend / 10);
+        }
+        return borrowedColumns > 0;
+    };
+    const firstWorksheet = await readProblems();
+    expect(firstWorksheet).toHaveLength(10);
+    expect(new Set(firstWorksheet.map(({digits}) => digits))).toEqual(new Set([3, 4]));
+    expect(firstWorksheet.every(({minuend, subtrahend, digits, visibleNumbers}) =>
+        minuend > subtrahend
+        && minuend.toString().length === digits
+        && subtrahend.toString().length === digits
+        && visibleNumbers[0] === minuend
+        && visibleNumbers[1] === subtrahend
+    )).toBe(true);
+    expect(firstWorksheet.every(({digits, carryBoxes, digitAlignment}) =>
+        carryBoxes === digits - 1 && digitAlignment
+    )).toBe(true);
+    expect(firstWorksheet.filter(requiresBorrowing)).toHaveLength(8);
+    expect(firstWorksheet.filter(problem => !requiresBorrowing(problem))).toHaveLength(2);
+    await expect(page.locator("#exercises .answer-space")).toHaveCount(10);
+
+    await page.evaluate(() => {
+        Math.random = () => 0.99;
+    });
+    await page.locator("#regenerate-worksheet").click();
+    const secondWorksheet = await readProblems();
+    expect(secondWorksheet).toHaveLength(10);
+    expect(secondWorksheet.filter(requiresBorrowing)).toHaveLength(8);
+    expect(secondWorksheet.filter(problem => !requiresBorrowing(problem))).toHaveLength(2);
+    expect(secondWorksheet.map(({minuend, subtrahend}) => [minuend, subtrahend]))
+        .not.toEqual(firstWorksheet.map(({minuend, subtrahend}) => [minuend, subtrahend]));
+    await page.emulateMedia({media: "print"});
+    await expect(page.locator("#regenerate-worksheet")).toHaveCSS("display", "none");
+    await page.emulateMedia({media: "screen"});
+    await page.locator("#print-worksheet").click();
+    await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
+    expect(pageErrors).toEqual([]);
+});
+
+test("multi-digit addition: creates sums with operands of up to four digits", async ({page}) => {
+    const pageErrors = [];
+    page.on("pageerror", error => pageErrors.push(error.message));
+    await page.addInitScript(() => {
+        Math.random = () => 0;
+        window.__printCalls = 0;
+        window.print = () => {
+            window.__printCalls += 1;
+        };
+    });
+    await page.goto("/matematiques/sumes-diverses-xifres/");
+
+    const readProblems = () => page.locator("#exercises > li").evaluateAll(items =>
+        items.map(item => ({
+            first: Number(item.dataset.firstNumber),
+            second: Number(item.dataset.secondNumber),
+            firstDigits: [...item.querySelectorAll(".number-digits")][0]
+                .innerText.replace(/\s/g, ""),
+            secondDigits: [...item.querySelectorAll(".number-digits")][1]
+                .innerText.replace(/\s/g, ""),
+        }))
+    );
+    const firstWorksheet = await readProblems();
+    expect(firstWorksheet).toHaveLength(10);
+    expect(firstWorksheet.every(({first, second, firstDigits, secondDigits}) =>
+        first >= 10
+        && second >= 10
+        && first <= 9999
+        && second <= 9999
+        && firstDigits === String(first)
+        && secondDigits === String(second)
+    )).toBe(true);
+    await expect(page.locator("#exercises .answer-space")).toHaveCount(10);
+
+    await page.evaluate(() => {
+        Math.random = () => 0.99;
+    });
+    await page.locator("#regenerate-worksheet").click();
+    const secondWorksheet = await readProblems();
+    expect(secondWorksheet).toHaveLength(10);
+    expect(secondWorksheet.map(({first, second}) => [first, second]))
+        .not.toEqual(firstWorksheet.map(({first, second}) => [first, second]));
+    await page.emulateMedia({media: "print"});
+    await expect(page.locator("#regenerate-worksheet")).toHaveCSS("display", "none");
+    await page.emulateMedia({media: "screen"});
+    await page.locator("#print-worksheet").click();
+    await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
+    expect(pageErrors).toEqual([]);
+});
+
+test("division worksheets generate exact problems with the requested digit lengths", async ({page}) => {
+    await page.addInitScript(() => {
+        Math.random = () => 0;
+    });
+    const divisionPages = [
+        {
+            path: "/matematiques/divisions/dues-tres-xifres-un-digit.html",
+            expectedDigitPairs: [[2, 1], [3, 1]],
+        },
+        {
+            path: "/matematiques/divisions/tres-quatre-xifres-un-dos-digits.html",
+            expectedDigitPairs: [[3, 1], [3, 2], [4, 1], [4, 2]],
+        },
+    ];
+
+    for (const {path, expectedDigitPairs} of divisionPages) {
+        await page.goto(path);
+        const readProblems = () => page.locator("#exercises > li").evaluateAll(items =>
+            items.map(item => ({
+                dividend: Number(item.dataset.dividend),
+                divisor: Number(item.dataset.divisor),
+                dividendDigits: item.dataset.dividendDigits || item.dataset.digits,
+                divisorDigits: item.dataset.divisorDigits || "1",
+                layout: {
+                    dividend: item.querySelector(".dividend")?.textContent,
+                    divisor: item.querySelector(".divisor-box")?.textContent,
+                    bracket: !!item.querySelector(".division-bracket"),
+                    quotientField: !!item.querySelector('[aria-label="Quocient"]'),
+                    divisionSymbolVisible: item.querySelector(".problem").innerText.includes("÷"),
+                },
+            }))
+        );
+        const firstWorksheet = await readProblems();
+        expect(firstWorksheet).toHaveLength(10);
+        expect(firstWorksheet.every(({
+            dividend,
+            divisor,
+            dividendDigits,
+            divisorDigits,
+            layout,
+        }) =>
+            dividend > 0
+            && divisor >= 2
+            && dividend % divisor === 0
+            && dividend.toString().length === Number(dividendDigits)
+            && divisor.toString().length === Number(divisorDigits)
+            && layout.dividend === String(dividend)
+            && layout.divisor === String(divisor)
+            && layout.bracket
+            && !layout.quotientField
+            && !layout.divisionSymbolVisible
+        ), path).toBe(true);
+        expect(new Set(firstWorksheet.map(({dividendDigits, divisorDigits}) =>
+            `${dividendDigits}:${divisorDigits}`
+        ))).toEqual(new Set(expectedDigitPairs.map(([dividendDigits, divisorDigits]) =>
+            `${dividendDigits}:${divisorDigits}`
+        )));
+        await expect(page.locator("#exercises [aria-label='Quocient']")).toHaveCount(0);
+
+        await page.evaluate(() => {
+            Math.random = () => 0.99;
+        });
+        await page.locator("#regenerate-worksheet").click();
+        const secondWorksheet = await readProblems();
+        expect(secondWorksheet).toHaveLength(10);
+        expect(secondWorksheet.every(({dividend, divisor}) => dividend % divisor === 0)).toBe(true);
+        expect(secondWorksheet.map(({dividend, divisor}) => [dividend, divisor]))
+            .not.toEqual(firstWorksheet.map(({dividend, divisor}) => [dividend, divisor]));
+    }
+});
+
 test("handwriting: displays four sentences, practice lines, and selectable fonts", async ({page}) => {
     const pageErrors = [];
     page.on("pageerror", error => pageErrors.push(error.message));
@@ -393,6 +608,10 @@ test("random worksheets can be regenerated from a small button hidden in print",
         "/lecto-escriptura/caligrafia/",
         "/matematiques/taules-multiplicar/",
         "/matematiques/taules-multiplicar/multiplicacions-grans.html",
+        "/matematiques/sumes-diverses-xifres/",
+        "/matematiques/restes-diverses-xifres/",
+        "/matematiques/divisions/dues-tres-xifres-un-digit.html",
+        "/matematiques/divisions/tres-quatre-xifres-un-dos-digits.html",
         "/geografia/comarques-catalunya/index.html",
         "/geografia/provincies-espanya/index.html",
         ...["africa", "america", "asia", "europa", "oceania"].map(continent =>

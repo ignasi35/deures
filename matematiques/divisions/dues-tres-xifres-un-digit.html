@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Divisions amb 1 xifra</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.5;
+                margin: 2rem auto;
+                max-width: 48rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .student-info {
+                display: flex;
+                gap: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .student-info span {
+                border-bottom: 1px solid #777;
+                flex: 1;
+            }
+
+            #exercises {
+                display: grid;
+                gap: 1.5rem 2rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #exercises li {
+                break-inside: avoid;
+            }
+
+            .problem {
+                font-family: monospace;
+                font-size: 1.7rem;
+                min-height: 6rem;
+            }
+
+            .division-layout {
+                align-items: center;
+                display: flex;
+                gap: 0.4ch;
+                min-height: 2.2em;
+            }
+
+            .dividend {
+                min-width: 3ch;
+                text-align: right;
+            }
+
+            .division-bracket {
+                align-self: stretch;
+                border-left: 2px solid #222;
+                width: 0;
+            }
+
+            .divisor-box {
+                border-bottom: 2px solid #222;
+                min-width: 2.5ch;
+                padding: 0 0.35ch;
+                text-align: center;
+            }
+
+            .working-space {
+                height: 2.5rem;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: 2rem;
+            }
+
+            .regenerate-button {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                position: fixed;
+                right: 0.75rem;
+                top: 0.75rem;
+                z-index: 1;
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media (max-width: 32rem) {
+                #exercises {
+                    grid-template-columns: 1fr;
+                }
+
+                .student-info {
+                    gap: 1rem;
+                }
+            }
+
+            @media print {
+                @page {
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 12pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                }
+
+                .student-info {
+                    margin: 1rem 0;
+                }
+
+                #exercises {
+                    gap: 1.25rem 1.5rem;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                .problem {
+                    font-size: 16pt;
+                    min-height: 5.5rem;
+                }
+
+                .working-space {
+                    height: 2rem;
+                }
+
+                .actions,
+                .regenerate-button {
+                    display: none;
+                }
+
+                .page-links {
+                    display: none;
+                }
+
+                footer {
+                    font-size: 8pt;
+                    margin-top: 0.5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <button id="regenerate-worksheet" class="regenerate-button" type="button">regenerar</button>
+            <p class="page-links"><a href="../index.html">Torna a matemàtiques</a></p>
+            <h1>Divisions amb 1 xifra</h1>
+            <p class="instructions">Resol les 10 divisions exactes.</p>
+            <p class="student-info">
+                Nom: <span></span>
+                Data: <span></span>
+            </p>
+            <ol id="exercises" aria-label="Divisions amb divisor d’una xifra"></ol>
+            <div class="actions">
+                <button id="new-worksheet" type="button">Nous exercicis</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
+        <script>
+            const exercises = document.querySelector("#exercises");
+            const newWorksheetButton = document.querySelector("#new-worksheet");
+            const regenerateButton = document.querySelector("#regenerate-worksheet");
+            const printWorksheetButton = document.querySelector("#print-worksheet");
+
+            function randomInteger(minimum, maximum) {
+                return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+            }
+
+            function createDivision(digits) {
+                const minimumDividend = 10 ** (digits - 1);
+                const maximumDividend = 10 ** digits - 1;
+                const divisor = randomInteger(2, 9);
+                const minimumQuotient = Math.ceil(minimumDividend / divisor);
+                const maximumQuotient = Math.floor(maximumDividend / divisor);
+                const quotient = randomInteger(minimumQuotient, maximumQuotient);
+                return {dividend: quotient * divisor, divisor};
+            }
+
+            function createWorksheet() {
+                exercises.replaceChildren();
+
+                for (let index = 0; index < 10; index += 1) {
+                    const digits = index % 2 === 0 ? 2 : 3;
+                    const {dividend, divisor} = createDivision(digits);
+                    const item = document.createElement("li");
+                    const problem = document.createElement("div");
+                    const divisionLayout = document.createElement("div");
+                    const dividendElement = document.createElement("span");
+                    const divisionBracket = document.createElement("span");
+                    const divisorBox = document.createElement("span");
+                    const workingSpace = document.createElement("div");
+
+                    item.dataset.dividend = String(dividend);
+                    item.dataset.divisor = String(divisor);
+                    item.dataset.digits = String(digits);
+                    problem.className = "problem";
+                    problem.setAttribute("aria-label", `${dividend} dividit per ${divisor}`);
+                    divisionLayout.className = "division-layout";
+                    divisionLayout.setAttribute("aria-hidden", "true");
+                    dividendElement.className = "dividend";
+                    dividendElement.textContent = String(dividend);
+                    divisionBracket.className = "division-bracket";
+                    divisorBox.className = "divisor-box";
+                    divisorBox.textContent = String(divisor);
+                    divisionLayout.append(dividendElement, divisionBracket, divisorBox);
+                    problem.append(divisionLayout);
+                    workingSpace.className = "working-space";
+                    workingSpace.setAttribute("aria-hidden", "true");
+                    item.append(problem, workingSpace);
+                    exercises.append(item);
+                }
+            }
+
+            newWorksheetButton.addEventListener("click", createWorksheet);
+            regenerateButton.addEventListener("click", createWorksheet);
+            printWorksheetButton.addEventListener("click", () => window.print());
+            createWorksheet();
+        </script>
+    </body>
+</html>
