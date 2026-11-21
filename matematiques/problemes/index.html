@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Problemes matemàtics</title>
+        <style>
+            body {
+                color: #222;
+                font-family: Arial, sans-serif;
+                line-height: 1.5;
+                margin: 2rem auto;
+                max-width: 48rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                margin-bottom: 0.25rem;
+            }
+
+            main {
+                --problem-gap: 5rem;
+            }
+
+            .instructions {
+                margin-top: 0;
+            }
+
+            .student-info {
+                display: flex;
+                gap: 2rem;
+                margin: 1.5rem 0;
+            }
+
+            .student-info span {
+                border-bottom: 1px solid #777;
+                flex: 1;
+            }
+
+            #problems {
+                display: grid;
+                gap: var(--problem-gap);
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            #problems li {
+                break-inside: avoid;
+            }
+
+            .problem-text {
+                margin: 0;
+            }
+
+            footer {
+                font-size: 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .actions {
+                display: flex;
+                gap: 0.75rem;
+                margin-top: calc(var(--problem-gap) + var(--problem-gap));
+            }
+
+            button {
+                cursor: pointer;
+                font: inherit;
+                padding: 0.5rem 1rem;
+            }
+
+            @media print {
+                @page {
+                    margin: 12mm;
+                }
+
+                body {
+                    color: #000;
+                    font-size: 12pt;
+                    margin: 0;
+                    max-width: none;
+                    padding: 0;
+                }
+
+                h1 {
+                    font-size: 20pt;
+                }
+
+                .student-info {
+                    margin: 1rem 0;
+                }
+
+                #problems {
+                    gap: 4.5rem;
+                }
+
+                .actions,
+                .page-links {
+                    display: none;
+                }
+
+                footer {
+                    font-size: 8pt;
+                    margin-top: 0.5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <p class="page-links"><a href="../index.html">Torna a l’índex de matemàtiques</a></p>
+            <h1>Problemes matemàtics</h1>
+            <p class="instructions">Llegeix cada problema, pensa quin càlcul et cal fer i escriu la resposta. La col·lecció té 50 enunciats diferents i cada fitxa en mostra 4.</p>
+            <p class="student-info">
+                Nom: <span></span>
+                Data: <span></span>
+            </p>
+            <ol id="problems" aria-label="Problemes matemàtics"></ol>
+            <div id="problem-bank" hidden>
+                <template data-type="addition">Durant la setmana cultural, la biblioteca de l’escola va rebre {first} llibres nous de diverses editorials. A més, les famílies van donar {second} llibres que s’han classificat i posat als prestatges. Quants llibres nous hi ha en total?</template>
+                <template data-type="addition">Per finançar la sortida de final de curs, els alumnes van recollir {first} euros venent manualitats. Després, el consell escolar hi va afegir {second} euros de la partida d’activitats. Quants euros tenen ara per pagar la sortida?</template>
+                <template data-type="addition">Al pati de l’escola s’ha fet una campanya per separar els residus i cuidar el medi ambient. Dilluns es van recollir {first} ampolles i divendres, després d’una nova jornada, se’n van recollir {second} més. Quantes ampolles es van recollir entre tots dos dies?</template>
+                <template data-type="addition">Una classe prepara una exposició sobre els animals dels diferents continents i ha reunit moltes imatges. A l’arxiu de l’escola ja n’hi havia {first} i les famílies n’han portat {second} de noves. Quantes imatges poden triar per muntar l’exposició?</template>
+                <template data-type="addition">En una cooperativa agrícola han collit pomes de dues finques abans que comenci la temporada de pluges. De la primera finca n’han omplert caixes amb {first} pomes i de la segona, caixes amb {second}. Quantes pomes han collit en total?</template>
+                <template data-type="addition">El museu del barri ha preparat una activitat perquè els infants coneguin la història de la ciutat. Dissabte hi van entrar {first} persones al matí i {second} persones a la tarda. Quantes persones van visitar el museu aquell dissabte?</template>
+                <template data-type="addition">La cuina de l’escola prepara els àpats amb productes de proximitat i cada setmana revisa les existències. Aquesta setmana han arribat {first} peces de fruita al matí i {second} peces més a la tarda. Quantes peces de fruita han arribat en total?</template>
+                <template data-type="addition">Durant la fira del llibre, diverses editorials han portat exemplars per a les parades de lectura. La primera parada ha rebut {first} llibres i la segona n’ha rebut {second}, tots diferents. Quants llibres hi ha entre les dues parades?</template>
+                <template data-type="addition">Els organitzadors d’una cursa popular volen tenir aigua preparada per a tots els participants i els voluntaris. Abans de començar han col·locat {first} ampolles a les taules i més tard n’hi han afegit {second}. Quantes ampolles hi ha preparades ara?</template>
+                <template data-type="addition">Per restaurar el jardí de l’escola, les famílies i l’alumnat han aportat eines i materials durant tot el mes. La primera setmana van portar {first} testos i la darrera setmana n’han portat {second} més. Quants testos tenen per plantar flors?</template>
+                <template data-type="addition">Un teatre ha venut entrades per a dues sessions d’una obra representada pels alumnes. A la sessió del matí hi van assistir {first} espectadors i a la sessió de la tarda, {second}. Quants espectadors van veure l’obra aquell dia?</template>
+                <template data-type="addition">Al viver municipal preparen arbres joves per replantar-los als carrers on falta ombra. Ja tenien {first} plançons a punt i aquesta setmana n’han crescut {second} més. Quants plançons hi ha disponibles per a la plantada?</template>
+                <template data-type="addition">Una associació veïnal organitza una recollida d’aliments abans de les vacances d’hivern. Els veïns han portat {first} paquets el primer cap de setmana i {second} paquets el segon. Quants paquets han recollit per repartir-los a les famílies?</template>
+
+                <template data-type="subtraction">El banc d’aliments del municipi havia preparat {first} lots amb productes bàsics per a les famílies. Al matí ja n’ha repartit {second} seguint la llista de serveis socials. Quants lots queden per repartir durant la tarda?</template>
+                <template data-type="subtraction">Per al festival de música de l’escola es van imprimir {first} entrades i moltes famílies les van comprar abans del cap de setmana. Fins avui se n’han venut {second}. Quantes entrades queden disponibles?</template>
+                <template data-type="subtraction">Un magatzem tenia {first} quaderns nous per preparar les comandes de les escoles de la comarca. Durant el matí ha enviat {second} quaderns en diversos paquets. Quants quaderns continuen al magatzem?</template>
+                <template data-type="subtraction">L’organització d’un torneig esportiu havia reservat {first} ampolles d’aigua per als equips participants. Després dels primers partits, els jugadors ja n’han utilitzat {second}. Quantes ampolles encara poden servir als equips?</template>
+                <template data-type="subtraction">A la plaça s’han plantat {first} flors per preparar el jardí per a la primavera i donar més color al barri. Una pluja forta n’ha fet malbé {second}, que caldrà substituir. Quantes flors han quedat en bon estat?</template>
+                <template data-type="subtraction">El museu havia preparat {first} fullets informatius per als visitants d’una exposició sobre els invents. Durant les visites guiades del matí se n’han lliurat {second}. Quants fullets queden per als visitants de la tarda?</template>
+                <template data-type="subtraction">Una escola va comprar {first} peces de construcció per renovar el material de les aules. Les classes de cicle inicial ja n’han rebut {second} per treballar en grup. Quantes peces queden per repartir a les altres classes?</template>
+                <template data-type="subtraction">La biblioteca tenia {first} llibres de lectura preparats per prestar durant el període de vacances. Els alumnes ja se n’han endut {second} per llegir a casa. Quants llibres continuen disponibles a la biblioteca?</template>
+                <template data-type="subtraction">Després d’una festa al parc, l’equip de neteja va trobar {first} gots reutilitzables escampats per les taules i les cadires. Ja n’ha rentat {second} i els ha guardat al magatzem. Quants gots li queden per rentar?</template>
+                <template data-type="subtraction">Per a una excursió al bosc s’havien preparat {first} entrepans, tenint en compte els alumnes i els adults acompanyants. A mig matí ja se n’havien menjat {second}. Quants entrepans queden per al dinar?</template>
+                <template data-type="subtraction">Una impremta va rebre una comanda de {first} cartells per anunciar les activitats del barri. Aquesta setmana ja n’ha lliurat {second} als comerços i als equipaments municipals. Quants cartells li falta lliurar?</template>
+                <template data-type="subtraction">Al poliesportiu hi havia {first} pilotes repartides entre els diferents equips de l’escola esportiva. Abans de començar els entrenaments, els monitors n’han guardat {second} perquè estaven punxades. Quantes pilotes es poden fer servir?</template>
+                <template data-type="subtraction">Un hort comunitari havia preparat {first} plançons per omplir els bancals abans de l’estiu. Els voluntaris ja n’han plantat {second} a les parcel·les que tenien adobades. Quants plançons queden per plantar?</template>
+
+                <template data-type="multiplication">Per a una activitat de dibuix, el mestre ha preparat {first} capses amb {second} llapis de colors cadascuna. Totes les capses tenen la mateixa quantitat i es repartiran entre els grups de classe. Quants llapis hi ha preparats en total?</template>
+                <template data-type="multiplication">En un teatre petit han col·locat {first} files de cadires per a la funció de final de curs. A cada fila hi ha {second} cadires i no en queda cap de buida al magatzem. Quantes cadires hi ha col·locades?</template>
+                <template data-type="multiplication">Una llibreria prepara lots de lectura per a les escoles que participen en una campanya. Cada lot porta {second} llibres i han de preparar {first} lots iguals. Quants llibres necessiten per completar totes les comandes?</template>
+                <template data-type="multiplication">Al jardí de l’escola hi ha {first} fileres de testos per fer un experiment sobre el creixement de les plantes. A cada filera hi han posat {second} llavors, una a cada test. Quantes llavors han plantat en total?</template>
+                <template data-type="multiplication">Per a la caminada solidària, els voluntaris preparen caixes d’aigua abans que arribin els participants. Cada caixa conté {second} ampolles i han descarregat {first} caixes. Quantes ampolles d’aigua tenen a punt per a la caminada?</template>
+                <template data-type="multiplication">A l’aula de música s’han distribuït {first} grups d’alumnes per assajar una cançó amb instruments. Cada grup necessita {second} instruments petits i tots els grups en faran servir el mateix nombre. Quants instruments calen?</template>
+                <template data-type="multiplication">Una empresa de transport escolar organitza {first} autocars per a una sortida de tot el cicle. A cada autocar hi poden viatjar {second} alumnes, i tots els seients estan ocupats. Quants alumnes hi van en total?</template>
+                <template data-type="multiplication">La classe està preparant carpetes amb les fitxes que faran servir durant el projecte de ciències. Cada carpeta conté {second} fitxes i els alumnes han muntat {first} carpetes iguals. Quantes fitxes han utilitzat?</template>
+                <template data-type="multiplication">Per identificar els participants d’una cursa, els organitzadors han preparat {first} sobres de dorsals. A cada sobre hi han posat {second} dorsals per als corredors d’un mateix equip. Quants dorsals han preparat en total?</template>
+                <template data-type="multiplication">En una obra de teatre escolar cal decorar diverses taules amb rajoles de colors que formen un mosaic. A cada taula hi posen {second} rajoles i han decorat {first} taules iguals. Quantes rajoles han col·locat?</template>
+                <template data-type="multiplication">Una pastisseria prepara safates de galetes per a la festa de l’escola i les reparteix en caixes. A cada caixa hi caben {second} galetes i han omplert {first} caixes. Quantes galetes han preparat?</template>
+                <template data-type="multiplication">Per al torneig de futbol, cada equip ha rebut {second} cons per marcar els límits del camp d’entrenament. Hi participen {first} equips i tots reben el mateix material. Quants cons s’han repartit entre els equips?</template>
+
+                <template data-type="division">La biblioteca ha rebut {first} punts de llibre per regalar als alumnes que participen en el repte lector. Els vol repartir en parts iguals entre {second} classes i no en vol guardar cap. Quants punts de llibre rebrà cada classe?</template>
+                <template data-type="division">Per a una excursió, la cuina ha preparat {first} peces de fruita per repartir entre {second} grups d’alumnes. Cada grup ha de rebre la mateixa quantitat perquè tots puguin esmorzar igual. Quantes peces corresponen a cada grup?</template>
+                <template data-type="division">Una associació ha recollit {first} euros per comprar material esportiu i els vol repartir equitativament entre {second} equips. Cada equip farà servir els diners per completar el seu material. Quants euros rebrà cada equip?</template>
+                <template data-type="division">Al magatzem hi ha {first} quaderns per preparar paquets iguals destinats a {second} escoles. Cada escola ha de rebre el mateix nombre de quaderns per començar el curs. Quants quaderns posaran a cada paquet?</template>
+                <template data-type="division">Després d’una campanya de reciclatge, els alumnes han reunit {first} envasos per fer una activitat de classificació. Els han de repartir en parts iguals entre {second} taules de treball. Quants envasos tindrà cada taula?</template>
+                <template data-type="division">Una cooperativa ha collit {first} pomes i les vol col·locar en caixes per enviar-les a {second} botigues del barri. Totes les botigues han de rebre la mateixa quantitat. Quantes pomes corresponen a cada botiga?</template>
+                <template data-type="division">Per a una jornada esportiva, s’han comprat {first} ampolles d’aigua per repartir-les entre {second} equips participants. Els organitzadors volen que tots els equips rebin exactament la mateixa quantitat. Quantes ampolles tindrà cada equip?</template>
+                <template data-type="division">L’escola ha imprès {first} invitacions per a una exposició de treballs i les reparteix entre {second} classes. Cada classe s’encarregarà de lliurar-ne la mateixa quantitat a les famílies. Quantes invitacions rep cada classe?</template>
+                <template data-type="division">En un taller de manualitats tenen {first} peces de fusta per preparar kits de construcció per a {second} grups. Cada grup ha de rebre el mateix material per poder fer la seva maqueta. Quantes peces hi haurà a cada kit?</template>
+                <template data-type="division">El viver municipal ha preparat {first} plançons per repartir-los entre {second} jardins públics que necessiten plantes noves. A cada jardí n’han de portar la mateixa quantitat. Quants plançons rebrà cada jardí?</template>
+                <template data-type="division">Una escola de música ha de repartir {first} partitures entre {second} corals que participaran en una trobada. Totes les corals interpretaran el mateix nombre de peces. Quantes partitures rebrà cada coral?</template>
+                <template data-type="division">Per a una festa popular s’han preparat {first} galetes per posar-les en safates iguals a les taules. Hi haurà {second} taules i cadascuna ha de tenir la mateixa quantitat. Quantes galetes posaran a cada taula?</template>
+            </div>
+            <div class="actions">
+                <button id="new-worksheet" type="button">Nous problemes</button>
+                <button id="print-worksheet" type="button">Imprimeix</button>
+            </div>
+        </main>
+        <footer>
+            <a href="https://github.com/ignasi35/deures/">Repositori del projecte</a>
+            <span> · Continguts amb llicència <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</span>
+        </footer>
+        <script>
+            const problems = document.querySelector("#problems");
+            const newWorksheetButton = document.querySelector("#new-worksheet");
+            const printWorksheetButton = document.querySelector("#print-worksheet");
+            const problemTemplates = [...document.querySelectorAll("#problem-bank template")];
+            const problemsPerWorksheet = 4;
+
+            function randomInteger(minimum, maximum) {
+                return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+            }
+
+            function formatNumber(number) {
+                return number.toLocaleString("ca-ES");
+            }
+
+            function createProblem(template, index) {
+                let first;
+                let second;
+
+                switch (template.dataset.type) {
+                    case "addition":
+                        first = randomInteger(1200, 4899);
+                        second = randomInteger(1200, 9999 - first);
+                        break;
+                    case "subtraction":
+                        first = randomInteger(3000, 9999);
+                        second = randomInteger(1000, first - 1);
+                        break;
+                    case "multiplication":
+                        first = randomInteger(12, 99);
+                        second = randomInteger(2, 9);
+                        break;
+                    case "division": {
+                        second = randomInteger(2, 9);
+                        first = second * randomInteger(12, 99);
+                        break;
+                    }
+                    default:
+                        throw new Error(`Tipus de problema desconegut: ${template.dataset.type}`);
+                }
+
+                const text = template.content.textContent.trim()
+                    .replaceAll("{first}", formatNumber(first))
+                    .replaceAll("{second}", formatNumber(second));
+                return {id: index, type: template.dataset.type, text, first, second};
+            }
+
+            function createWorksheet() {
+                problems.replaceChildren();
+
+                const shuffledTemplates = [...problemTemplates];
+                for (let index = shuffledTemplates.length - 1; index > 0; index -= 1) {
+                    const swapIndex = randomInteger(0, index);
+                    [shuffledTemplates[index], shuffledTemplates[swapIndex]] =
+                        [shuffledTemplates[swapIndex], shuffledTemplates[index]];
+                }
+
+                shuffledTemplates.slice(0, problemsPerWorksheet).forEach((template, index) => {
+                    const {id, type, text, first, second} = createProblem(
+                        template,
+                        problemTemplates.indexOf(template)
+                    );
+                    const item = document.createElement("li");
+                    const problemText = document.createElement("p");
+
+                    item.dataset.problemId = String(id);
+                    item.dataset.problemType = type;
+                    item.dataset.firstNumber = String(first);
+                    item.dataset.secondNumber = String(second);
+                    problemText.className = "problem-text";
+                    problemText.textContent = `${index + 1}. ${text}`;
+                    item.append(problemText);
+                    problems.append(item);
+                });
+            }
+
+            newWorksheetButton.addEventListener("click", createWorksheet);
+            printWorksheetButton.addEventListener("click", () => window.print());
+            createWorksheet();
+        </script>
+    </body>
+</html>

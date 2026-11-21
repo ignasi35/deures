@@ -329,7 +329,9 @@ test("multi-digit subtraction: most problems require borrowing and all stay posi
     });
     await page.goto("/matematiques/restes-diverses-xifres/");
 
-    await expect(page.locator("#regenerate-worksheet")).toHaveText("regenerar");
+    const newWorksheetButton = page.locator("#new-worksheet");
+    await expect(page.locator("#regenerate-worksheet")).toHaveCount(0);
+    await expect(newWorksheetButton).toHaveText("Nous exercicis");
     const readProblems = () => page.locator("#exercises li").evaluateAll(items =>
         items.map(item => ({
             minuend: Number(item.dataset.minuend),
@@ -392,7 +394,7 @@ test("multi-digit subtraction: most problems require borrowing and all stay posi
     await page.evaluate(() => {
         Math.random = () => 0.99;
     });
-    await page.locator("#regenerate-worksheet").click();
+    await newWorksheetButton.click();
     const secondWorksheet = await readProblems();
     expect(secondWorksheet).toHaveLength(10);
     expect(secondWorksheet.filter(requiresBorrowing)).toHaveLength(8);
@@ -400,7 +402,7 @@ test("multi-digit subtraction: most problems require borrowing and all stay posi
     expect(secondWorksheet.map(({minuend, subtrahend}) => [minuend, subtrahend]))
         .not.toEqual(firstWorksheet.map(({minuend, subtrahend}) => [minuend, subtrahend]));
     await page.emulateMedia({media: "print"});
-    await expect(page.locator("#regenerate-worksheet")).toHaveCSS("display", "none");
+    await expect(newWorksheetButton).toBeHidden();
     await page.emulateMedia({media: "screen"});
     await page.locator("#print-worksheet").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
@@ -444,13 +446,13 @@ test("multi-digit addition: creates sums with operands of up to four digits", as
     await page.evaluate(() => {
         Math.random = () => 0.99;
     });
-    await page.locator("#regenerate-worksheet").click();
+    await page.locator("#new-worksheet").click();
     const secondWorksheet = await readProblems();
     expect(secondWorksheet).toHaveLength(10);
     expect(secondWorksheet.map(({first, second}) => [first, second]))
         .not.toEqual(firstWorksheet.map(({first, second}) => [first, second]));
     await page.emulateMedia({media: "print"});
-    await expect(page.locator("#regenerate-worksheet")).toHaveCSS("display", "none");
+    await expect(page.locator("#new-worksheet")).toBeHidden();
     await page.emulateMedia({media: "screen"});
     await page.locator("#print-worksheet").click();
     await expect.poll(() => page.evaluate(() => window.__printCalls)).toBe(1);
@@ -519,7 +521,7 @@ test("division worksheets generate exact problems with the requested digit lengt
         await page.evaluate(() => {
             Math.random = () => 0.99;
         });
-        await page.locator("#regenerate-worksheet").click();
+        await page.locator("#new-worksheet").click();
         const secondWorksheet = await readProblems();
         expect(secondWorksheet).toHaveLength(10);
         expect(secondWorksheet.every(({dividend, divisor}) => dividend % divisor === 0)).toBe(true);
@@ -599,7 +601,7 @@ test("handwriting: displays four sentences, practice lines, and selectable fonts
     expect(pageErrors).toEqual([]);
 });
 
-test("random worksheets can be regenerated from a small button hidden in print", async ({page}) => {
+test("random worksheets can be regenerated from their main button", async ({page}) => {
     await page.addInitScript(() => {
         Math.random = () => 0;
     });
@@ -621,9 +623,12 @@ test("random worksheets can be regenerated from a small button hidden in print",
 
     for (const path of randomExercisePages) {
         await page.goto(path);
-        const regenerateButton = page.locator("#regenerate-worksheet");
-        await expect(regenerateButton).toHaveText("regenerar");
-        await expect(regenerateButton).toHaveCSS("position", "fixed");
+        const newWorksheetButton = page.locator(
+            path.startsWith("/geografia/") ? "#new-questions" : "#new-worksheet"
+        );
+        await expect(page.locator("#regenerate-worksheet")).toHaveCount(0);
+        await expect(newWorksheetButton).toBeVisible();
+        await expect(newWorksheetButton).not.toBeEmpty();
         const readWorksheet = () => path.startsWith("/geografia/")
             ? page.locator(".worksheet").evaluate(worksheet => JSON.stringify({
                 mode: worksheet.dataset.mode,
@@ -639,12 +644,12 @@ test("random worksheets can be regenerated from a small button hidden in print",
         await page.evaluate(() => {
             Math.random = () => 0.99;
         });
-        await regenerateButton.click();
+        await newWorksheetButton.click();
         expect(await readWorksheet(), path).not.toBe(firstWorksheet);
         expect(page.url()).toContain(path);
 
         await page.emulateMedia({media: "print"});
-        await expect(regenerateButton).toHaveCSS("display", "none");
+        await expect(newWorksheetButton).toBeHidden();
         await page.emulateMedia({media: "screen"});
     }
 });

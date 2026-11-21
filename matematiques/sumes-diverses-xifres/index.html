@@ -102,15 +102,6 @@
                 margin-top: 2rem;
             }
 
-            .regenerate-button {
-                font-size: 0.75rem;
-                padding: 0.25rem 0.5rem;
-                position: fixed;
-                right: 0.75rem;
-                top: 0.75rem;
-                z-index: 1;
-            }
-
             button {
                 cursor: pointer;
                 font: inherit;
@@ -174,8 +165,7 @@
                 }
 
                 .actions,
-                .page-links,
-                .regenerate-button {
+                .page-links {
                     display: none;
                 }
 
@@ -188,7 +178,6 @@
     </head>
     <body>
         <main>
-            <button id="regenerate-worksheet" class="regenerate-button" type="button">regenerar</button>
             <p class="page-links"><a href="../index.html">Torna a l’índex de matemàtiques</a></p>
             <h1>Sumes de fins a 4 xifres</h1>
             <p class="instructions">Resol les 10 sumes. Cada nombre té com a màxim 4 xifres.</p>
@@ -209,7 +198,6 @@
         <script>
             const exercises = document.querySelector("#exercises");
             const newWorksheetButton = document.querySelector("#new-worksheet");
-            const regenerateButton = document.querySelector("#regenerate-worksheet");
             const printWorksheetButton = document.querySelector("#print-worksheet");
 
             function randomInteger(minimum, maximum) {
@@ -270,7 +258,6 @@
             }
 
             newWorksheetButton.addEventListener("click", createWorksheet);
-            regenerateButton.addEventListener("click", createWorksheet);
             printWorksheetButton.addEventListener("click", () => window.print());
             createWorksheet();
         </script>
