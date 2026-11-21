@@ -20,9 +20,16 @@
     const title = document.querySelector("#quiz-title");
     const instructions = document.querySelector("#quiz-instructions");
     const questionHeadings = document.querySelector("#question-headings");
+    const regenerateButton = document.createElement("button");
     const svgNamespace = "http://www.w3.org/2000/svg";
     const letters = "abcdefghijklmnopqrstuvwxyz";
     const exerciseCount = Math.min(18, data.entries.length);
+
+    regenerateButton.className = "regenerate-button";
+    regenerateButton.id = "regenerate-worksheet";
+    regenerateButton.textContent = "regenerar";
+    regenerateButton.type = "button";
+    document.body.append(regenerateButton);
 
     map.alt = data.mapAlt;
     labels.setAttribute("viewBox", data.viewBox);
@@ -167,6 +174,7 @@
     }
 
     document.querySelector("#new-questions").addEventListener("click", createQuestions);
+    regenerateButton.addEventListener("click", createQuestions);
     document.querySelector("#print-worksheet").addEventListener("click", () => window.print());
     createQuestions();
 })();

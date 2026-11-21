@@ -74,6 +74,15 @@
                 margin-top: 2rem;
             }
 
+            .regenerate-button {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                position: fixed;
+                right: 0.75rem;
+                top: 0.75rem;
+                z-index: 1;
+            }
+
             button {
                 cursor: pointer;
                 font: inherit;
@@ -121,7 +130,8 @@
                 }
 
                 .actions,
-                .index-link {
+                .index-link,
+                .regenerate-button {
                     display: none;
                 }
 
@@ -134,6 +144,7 @@
     </head>
     <body>
         <main>
+            <button id="regenerate-worksheet" class="regenerate-button" type="button">regenerar</button>
             <p class="index-link"><a href="../index.html">Torna als exercicis d’anglès</a></p>
             <h1>Verb to be</h1>
             <p class="instructions">Completa cada espai amb el verb que falta (<em>am</em>, <em>is</em> o <em>are</em>) o amb el pronom o subjecte que falta.</p>
@@ -154,6 +165,7 @@
         <script>
             const exercises = document.querySelector("#exercises");
             const newWorksheetButton = document.querySelector("#new-worksheet");
+            const regenerateButton = document.querySelector("#regenerate-worksheet");
             const printWorksheetButton = document.querySelector("#print-worksheet");
 
             const subjects = [
@@ -282,6 +294,7 @@
             }
 
             newWorksheetButton.addEventListener("click", createWorksheet);
+            regenerateButton.addEventListener("click", createWorksheet);
             printWorksheetButton.addEventListener("click", () => window.print());
             createWorksheet();
         </script>

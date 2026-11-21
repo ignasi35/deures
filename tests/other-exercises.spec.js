@@ -383,3 +383,49 @@ test("handwriting: displays four sentences, practice lines, and selectable fonts
     expect(printFontSize).toBeLessThan(31);
     expect(pageErrors).toEqual([]);
 });
+
+test("random worksheets can be regenerated from a small button hidden in print", async ({page}) => {
+    await page.addInitScript(() => {
+        Math.random = () => 0;
+    });
+    const randomExercisePages = [
+        "/angles/verb-to-be/",
+        "/lecto-escriptura/caligrafia/",
+        "/matematiques/taules-multiplicar/",
+        "/matematiques/taules-multiplicar/multiplicacions-grans.html",
+        "/geografia/comarques-catalunya/index.html",
+        "/geografia/provincies-espanya/index.html",
+        ...["africa", "america", "asia", "europa", "oceania"].map(continent =>
+            `/geografia/paisos-mon/${continent}/index.html`
+        ),
+    ];
+
+    for (const path of randomExercisePages) {
+        await page.goto(path);
+        const regenerateButton = page.locator("#regenerate-worksheet");
+        await expect(regenerateButton).toHaveText("regenerar");
+        await expect(regenerateButton).toHaveCSS("position", "fixed");
+        const readWorksheet = () => path.startsWith("/geografia/")
+            ? page.locator(".worksheet").evaluate(worksheet => JSON.stringify({
+                mode: worksheet.dataset.mode,
+                title: worksheet.querySelector("#quiz-title").textContent,
+                questions: worksheet.querySelector("#questions").innerHTML,
+                labels: worksheet.querySelector("#map-labels").innerHTML,
+            }))
+            : page.locator("#exercises, #sentences").evaluate(
+                worksheet => worksheet.innerHTML
+            );
+        const firstWorksheet = await readWorksheet();
+
+        await page.evaluate(() => {
+            Math.random = () => 0.99;
+        });
+        await regenerateButton.click();
+        expect(await readWorksheet(), path).not.toBe(firstWorksheet);
+        expect(page.url()).toContain(path);
+
+        await page.emulateMedia({media: "print"});
+        await expect(regenerateButton).toHaveCSS("display", "none");
+        await page.emulateMedia({media: "screen"});
+    }
+});

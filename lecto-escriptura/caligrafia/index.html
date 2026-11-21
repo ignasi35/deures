@@ -108,6 +108,15 @@
                 margin-top: 2rem;
             }
 
+            .regenerate-button {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                position: fixed;
+                right: 0.75rem;
+                top: 0.75rem;
+                z-index: 1;
+            }
+
             button {
                 cursor: pointer;
                 font: inherit;
@@ -154,7 +163,8 @@
                     grid-template-rows: repeat(5, 1.6rem);
                 }
 
-                .actions {
+                .actions,
+                .regenerate-button {
                     display: none;
                 }
 
@@ -175,6 +185,7 @@
     </head>
     <body>
         <main>
+            <button id="regenerate-worksheet" class="regenerate-button" type="button">regenerar</button>
             <p class="index-link"><a href="../index.html">Torna a l’índex</a></p>
             <div class="font-selector">
                 <label for="font-choice">Tipus de lletra:</label>
@@ -297,6 +308,7 @@
 
             const sentences = document.querySelector("#sentences");
             const newWorksheetButton = document.querySelector("#new-worksheet");
+            const regenerateButton = document.querySelector("#regenerate-worksheet");
             const printWorksheetButton = document.querySelector("#print-worksheet");
             const fontChoice = document.querySelector("#font-choice");
             const fontFamilies = {
@@ -355,6 +367,7 @@
             }
 
             newWorksheetButton.addEventListener("click", createWorksheet);
+            regenerateButton.addEventListener("click", createWorksheet);
             printWorksheetButton.addEventListener("click", () => window.print());
             createWorksheet();
         </script>
