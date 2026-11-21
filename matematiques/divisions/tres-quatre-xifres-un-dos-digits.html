@@ -203,7 +203,8 @@
                 const maximumDividend = 10 ** dividendDigits - 1;
                 const minimumDivisor = 10 ** (divisorDigits - 1);
                 const maximumDivisor = divisorDigits === 1 ? 9 : 99;
-                const divisor = randomInteger(minimumDivisor, maximumDivisor);
+                const minimumValidDivisor = divisorDigits === 1 ? 2 : minimumDivisor;
+                const divisor = randomInteger(minimumValidDivisor, maximumDivisor);
                 const minimumQuotient = Math.ceil(minimumDividend / divisor);
                 const maximumQuotient = Math.floor(maximumDividend / divisor);
                 const quotient = randomInteger(minimumQuotient, maximumQuotient);
